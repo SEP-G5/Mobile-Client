@@ -1,10 +1,11 @@
 import React from 'react';
-import { Text } from 'react-native';
+import { View } from 'react-native';
+import SimpleComponent from '../components/SimpleComponent'
 
 export default function HomeScreen() {
     return (
-        <Text>
-            abc
-        </Text>
+        <View>
+            <SimpleComponent />
+        </View>
     );
 }
