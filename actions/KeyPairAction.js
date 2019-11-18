@@ -4,6 +4,8 @@ import { AsyncStorage } from 'react-native';
 export const GET_KEYPAIR_REQUEST = 'get_keypair_request';
 export const GET_KEYPAIR_FAILURE = 'get_keypair_failure';
 export const GET_KEYPAIR_SUCCESS = 'get_keypair_success';
+export const CREATE_KEYPAIR_REQUEST = 'create_keypair_request';
+export const CREATE_KEYPAIR_FAILURE = 'create_keypair_failure';
 
 export const getKeyPair = () => {
     return (dispatch) => {
@@ -14,10 +16,15 @@ export const getKeyPair = () => {
             if (keyPair) {
                 dispatch(getKeyPairSuccess(keyPair));
             } else {
+                dispatch(createKeyPairRequest());
                 createKeyPairAsync().then(function (keyPair) {
                     dispatch(getKeyPairSuccess(keyPair));
+                }).catch(function (error) {
+                    dispatch(createKeyPairFailure(error));
                 });
             }
+        }).catch(function (error) {
+            dispatch(getKeyPairFailure(error));
         });
     }
 }
@@ -47,8 +54,9 @@ const createKeyPairAsync = async () => {
     return keyPair;
 }
 
-const deleteKeyPair = () => {
-
+const deleteKeyPairAsync = async () => {
+    await AsyncStorage.setItem('PUBLIC_KEY', keyPair.publicKey);
+    await AsyncStorage.setItem('PRIVATE_KEY', keyPair.privateKey);
 }
 
 const getKeyPairRequest = () => {
@@ -57,7 +65,7 @@ const getKeyPairRequest = () => {
     }
 }
 
-const getKeyPairFailure = () => {
+const getKeyPairFailure = (error) => {
     return {
         type: GET_KEYPAIR_FAILURE
     }
@@ -69,5 +77,17 @@ const getKeyPairSuccess = (keyPair) => {
         payload: {
             ...keyPair
         }
+    }
+}
+
+const createKeyPairRequest = () => {
+    return {
+        type: CREATE_KEYPAIR_REQUEST
+    }
+}
+
+const createKeyPairFailure = (error) => {
+    return {
+        type: CREATE_KEYPAIR_FAILURE
     }
 }
