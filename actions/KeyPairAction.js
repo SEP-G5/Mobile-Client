@@ -6,6 +6,9 @@ export const GET_KEYPAIR_FAILURE = 'get_keypair_failure';
 export const GET_KEYPAIR_SUCCESS = 'get_keypair_success';
 export const CREATE_KEYPAIR_REQUEST = 'create_keypair_request';
 export const CREATE_KEYPAIR_FAILURE = 'create_keypair_failure';
+export const DELETE_KEYPAIR_REQUEST = 'delete_keypair_request';
+export const DELETE_KEYPAIR_FAILURE = 'delete_keypair_failure';
+export const DELETE_KEYPAIR_SUCCESS = 'delete_keypair_success';
 
 export const getKeyPair = () => {
     return (dispatch) => {
@@ -25,6 +28,18 @@ export const getKeyPair = () => {
             }
         }).catch(function (error) {
             dispatch(getKeyPairFailure(error));
+        });
+    }
+}
+
+export const deleteKeyPair = () => {
+    return (dispatch) => {
+        dispatch(deleteKeyPairRequest());
+        
+        deleteKeyPairAsync().then(function () {
+            dispatch(deleteKeyPairSuccess());
+        }).catch(function (error) {
+            dispatch(deleteKeyPairFailure(error));
         });
     }
 }
@@ -55,8 +70,8 @@ const createKeyPairAsync = async () => {
 }
 
 const deleteKeyPairAsync = async () => {
-    await AsyncStorage.setItem('PUBLIC_KEY', keyPair.publicKey);
-    await AsyncStorage.setItem('PRIVATE_KEY', keyPair.privateKey);
+    await AsyncStorage.removeItem('PUBLIC_KEY');
+    await AsyncStorage.removeItem('PRIVATE_KEY');
 }
 
 const getKeyPairRequest = () => {
@@ -89,5 +104,23 @@ const createKeyPairRequest = () => {
 const createKeyPairFailure = (error) => {
     return {
         type: CREATE_KEYPAIR_FAILURE
+    }
+}
+
+const deleteKeyPairRequest = () => {
+    return {
+        type: DELETE_KEYPAIR_REQUEST
+    }
+}
+
+const deleteKeyPairFailure = (error) => {
+    return {
+        type: DELETE_KEYPAIR_FAILURE
+    }
+}
+
+const deleteKeyPairSuccess = () => {
+    return {
+        type: DELETE_KEYPAIR_SUCCESS
     }
 }

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Text } from 'react-native';
-import { getKeyPair } from '../actions/KeyPairAction'
+import { View, Text, Button } from 'react-native';
+import { getKeyPair, deleteKeyPair } from '../actions/KeyPairAction'
 
 class SimpleComponent extends Component {
 
@@ -9,18 +9,28 @@ class SimpleComponent extends Component {
         this.props.getKeyPair();
     }
 
+    onPressDelete() {
+        this.props.deleteKeyPair();
+    }
+
     render() {
         return (
-            <Text>
+            <View>
+                <Button
+                    title="Delete key pair"
+                    onPress={this.onPressDelete.bind(this)}
+                />
                 <Text>
-                    {this.props.publicKey}
+                    <Text>
+                        {this.props.publicKey}
+                    </Text>
+                    <br />
+                    <br />
+                    <Text>
+                        {this.props.privateKey}
+                    </Text>
                 </Text>
-                <br />
-                <br />
-                <Text>
-                    {this.props.privateKey}
-                </Text>
-            </Text>
+            </View>
         );
     }
 
@@ -34,4 +44,4 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps, { getKeyPair })(SimpleComponent);
+export default connect(mapStateToProps, { getKeyPair, deleteKeyPair })(SimpleComponent);

@@ -1,5 +1,5 @@
 import Immutable from 'immutable';
-import { GET_KEYPAIR_SUCCESS } from '../actions/KeyPairAction'
+import { GET_KEYPAIR_SUCCESS, DELETE_KEYPAIR_SUCCESS } from '../actions/KeyPairAction'
 
 const initialState = Immutable.fromJS({
     publicKey: "",
@@ -13,6 +13,10 @@ export default (state = initialState, action) => {
             return state
                 .set('publicKey', action.payload.publicKey)
                 .set('privateKey', action.payload.privateKey);
+        case DELETE_KEYPAIR_SUCCESS:
+            return state
+                .set('publicKey', "")
+                .set('privateKey', "");
         default:
             return state;
     }
