@@ -24,8 +24,6 @@ class SimpleComponent extends Component {
                     <Text>
                         {this.props.publicKey}
                     </Text>
-                    <br />
-                    <br />
                     <Text>
                         {this.props.privateKey}
                     </Text>

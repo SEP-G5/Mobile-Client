@@ -5,6 +5,7 @@ import {
     GET_KEYPAIR_SUCCESS,
     CREATE_KEYPAIR_REQUEST,
     CREATE_KEYPAIR_FAILURE,
+    CREATE_KEYPAIR_SUCCESS,
     DELETE_KEYPAIR_REQUEST,
     DELETE_KEYPAIR_FAILURE,
     DELETE_KEYPAIR_SUCCESS
@@ -34,6 +35,7 @@ export default (state = initialState, action) => {
             return state
                 .set('loading', false)
                 .set('error', undefined);
+        case CREATE_KEYPAIR_SUCCESS:
         case GET_KEYPAIR_SUCCESS:
             return state
                 .set('loading', false)

@@ -6,28 +6,35 @@ export const GET_KEYPAIR_FAILURE = 'get_keypair_failure';
 export const GET_KEYPAIR_SUCCESS = 'get_keypair_success';
 export const CREATE_KEYPAIR_REQUEST = 'create_keypair_request';
 export const CREATE_KEYPAIR_FAILURE = 'create_keypair_failure';
+export const CREATE_KEYPAIR_SUCCESS = 'create_keypair_success';
 export const DELETE_KEYPAIR_REQUEST = 'delete_keypair_request';
 export const DELETE_KEYPAIR_FAILURE = 'delete_keypair_failure';
 export const DELETE_KEYPAIR_SUCCESS = 'delete_keypair_success';
 
 export const getKeyPair = () => {
     return (dispatch) => {
-
         dispatch(getKeyPairRequest());
 
-        getKeyPairAsync().then(function (keyPair) {
+        return getKeyPairAsync().then(function (keyPair) {
             if (keyPair) {
                 dispatch(getKeyPairSuccess(keyPair));
             } else {
-                dispatch(createKeyPairRequest());
-                createKeyPairAsync().then(function (keyPair) {
-                    dispatch(getKeyPairSuccess(keyPair));
-                }).catch(function (error) {
-                    dispatch(createKeyPairFailure(error));
-                });
+                dispatch(createKeyPair());
             }
         }).catch(function (error) {
             dispatch(getKeyPairFailure(error));
+        });
+    }
+}
+
+export const createKeyPair = () => {
+    return (dispatch) => {
+        dispatch(createKeyPairRequest());
+
+        return createKeyPairAsync().then(function (keyPair) {
+            dispatch(createKeyPairSuccess(keyPair));
+        }).catch(function (error) {
+            dispatch(createKeyPairFailure(error));
         });
     }
 }
@@ -36,7 +43,7 @@ export const deleteKeyPair = () => {
     return (dispatch) => {
         dispatch(deleteKeyPairRequest());
 
-        deleteKeyPairAsync().then(function () {
+        return deleteKeyPairAsync().then(function () {
             dispatch(deleteKeyPairSuccess());
         }).catch(function (error) {
             dispatch(deleteKeyPairFailure(error));
@@ -108,6 +115,15 @@ const createKeyPairRequest = () => {
 const createKeyPairFailure = (error) => {
     return {
         type: CREATE_KEYPAIR_FAILURE
+    }
+}
+
+const createKeyPairSuccess = (keyPair) => {
+    return {
+        type: GET_KEYPAIR_SUCCESS,
+        payload: {
+            ...keyPair
+        }
     }
 }
 
