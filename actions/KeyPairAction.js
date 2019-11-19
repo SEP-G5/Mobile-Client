@@ -35,7 +35,7 @@ export const getKeyPair = () => {
 export const deleteKeyPair = () => {
     return (dispatch) => {
         dispatch(deleteKeyPairRequest());
-        
+
         deleteKeyPairAsync().then(function () {
             dispatch(deleteKeyPairSuccess());
         }).catch(function (error) {
@@ -55,18 +55,22 @@ const getKeyPairAsync = async () => {
     };
 }
 
-const createKeyPairAsync = async () => {
-    var crypt = new JSEncrypt({ default_key_size: 2048 });
+const createKeyPairAsync = () => {
+    return new Promise(async function (resolve) {
+        var crypt = new JSEncrypt({ default_key_size: 2048 });
 
-    const keyPair = {
-        publicKey: crypt.getPublicKey(),
-        privateKey: crypt.getPrivateKey(),
-    };
+        crypt.getKey(async function () {
+            const keyPair = {
+                publicKey: crypt.getPublicKey(),
+                privateKey: crypt.getPrivateKey(),
+            };
 
-    await AsyncStorage.setItem('PUBLIC_KEY', keyPair.publicKey);
-    await AsyncStorage.setItem('PRIVATE_KEY', keyPair.privateKey);
+            await AsyncStorage.setItem('PUBLIC_KEY', keyPair.publicKey);
+            await AsyncStorage.setItem('PRIVATE_KEY', keyPair.privateKey);
 
-    return keyPair;
+            resolve(keyPair);
+        });
+    });
 }
 
 const deleteKeyPairAsync = async () => {
