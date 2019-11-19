@@ -1,6 +1,10 @@
 import { JSEncrypt } from 'jsencrypt'
 import { AsyncStorage } from 'react-native';
 
+export const KEY_SIZE = 2048;
+export const PUBLIC_KEY = 'PUBLIC_KEY';
+export const PRIVATE_KEY = 'PRIVATE_KEY';
+
 export const GET_KEYPAIR_REQUEST = 'get_keypair_request';
 export const GET_KEYPAIR_FAILURE = 'get_keypair_failure';
 export const GET_KEYPAIR_SUCCESS = 'get_keypair_success';
@@ -52,8 +56,8 @@ export const deleteKeyPair = () => {
 }
 
 const getKeyPairAsync = async () => {
-    const publicKey = await AsyncStorage.getItem('PUBLIC_KEY');
-    const privateKey = await AsyncStorage.getItem('PRIVATE_KEY');
+    const publicKey = await AsyncStorage.getItem(PUBLIC_KEY);
+    const privateKey = await AsyncStorage.getItem(PRIVATE_KEY);
     if (publicKey === null || privateKey === null)
         return undefined;
     return {
@@ -64,7 +68,7 @@ const getKeyPairAsync = async () => {
 
 const createKeyPairAsync = () => {
     return new Promise(async function (resolve) {
-        var crypt = new JSEncrypt({ default_key_size: 2048 });
+        var crypt = new JSEncrypt({ default_key_size: KEY_SIZE });
 
         crypt.getKey(async function () {
             const keyPair = {
@@ -72,8 +76,8 @@ const createKeyPairAsync = () => {
                 privateKey: crypt.getPrivateKey(),
             };
 
-            await AsyncStorage.setItem('PUBLIC_KEY', keyPair.publicKey);
-            await AsyncStorage.setItem('PRIVATE_KEY', keyPair.privateKey);
+            await AsyncStorage.setItem(PUBLIC_KEY, keyPair.publicKey);
+            await AsyncStorage.setItem(PRIVATE_KEY, keyPair.privateKey);
 
             resolve(keyPair);
         });
@@ -81,8 +85,8 @@ const createKeyPairAsync = () => {
 }
 
 const deleteKeyPairAsync = async () => {
-    await AsyncStorage.removeItem('PUBLIC_KEY');
-    await AsyncStorage.removeItem('PRIVATE_KEY');
+    await AsyncStorage.removeItem(PUBLIC_KEY);
+    await AsyncStorage.removeItem(PRIVATE_KEY);
 }
 
 const getKeyPairRequest = () => {
