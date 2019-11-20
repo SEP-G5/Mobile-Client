@@ -97,7 +97,10 @@ const getKeyPairRequest = () => {
 
 const getKeyPairFailure = (error) => {
     return {
-        type: GET_KEYPAIR_FAILURE
+        type: GET_KEYPAIR_FAILURE,
+        payload: {
+            error
+        }
     }
 }
 
@@ -118,7 +121,10 @@ const createKeyPairRequest = () => {
 
 const createKeyPairFailure = (error) => {
     return {
-        type: CREATE_KEYPAIR_FAILURE
+        type: CREATE_KEYPAIR_FAILURE,
+        payload: {
+            error
+        }
     }
 }
 
@@ -139,7 +145,10 @@ const deleteKeyPairRequest = () => {
 
 const deleteKeyPairFailure = (error) => {
     return {
-        type: DELETE_KEYPAIR_FAILURE
+        type: DELETE_KEYPAIR_FAILURE,
+        payload: {
+            error
+        }
     }
 }
 

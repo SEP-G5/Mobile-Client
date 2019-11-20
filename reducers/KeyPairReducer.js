@@ -34,7 +34,7 @@ export default (state = initialState, action) => {
         case GET_KEYPAIR_FAILURE:
             return state
                 .set('loading', false)
-                .set('error', undefined);
+                .set('error', action.payload);
         case CREATE_KEYPAIR_SUCCESS:
         case GET_KEYPAIR_SUCCESS:
             return state
