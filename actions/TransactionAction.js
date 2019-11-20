@@ -4,6 +4,9 @@ import sha256 from 'crypto-js/sha256';
 export const CREATE_TRANSACTION_REQUEST = 'create_transaction_request';
 export const CREATE_TRANSACTION_FAILURE = 'create_transaction_failure';
 export const CREATE_TRANSACTION_SUCCESS = 'create_transaction_success';
+export const VERIFY_TRANSACTION_REQUEST = 'verify_transaction_request';
+export const VERIFY_TRANSACTION_FAILURE = 'verify_transaction_failure';
+export const VERIFY_TRANSACTION_SUCCESS = 'verify_transaction_success';
 
 export const createTransaction = (id, publicKeyInput, publicKeyOutput, privateKey) => {
     return (dispatch) => {
@@ -17,9 +20,15 @@ export const createTransaction = (id, publicKeyInput, publicKeyOutput, privateKe
     }
 }
 
-export const sendTransaction = (transaction) => {
+export const verifyTransaction = (transaction) => {
     return (dispatch) => {
-        // send transaction to the blockchain, store it if offline
+        dispatch(verifyTransactionRequest());
+
+        return verifyTransactionAsync(transaction).then(function (valid) {
+            dispatch(verifyTransactionSuccess(valid));
+        }).catch(function (error) {
+            dispatch(verifyTransactionFailure(error));
+        });
     }
 }
 
@@ -48,6 +57,39 @@ const createTransactionAsync = (id, publicKeyInput, publicKeyOutput, privateKey)
     });
 }
 
+const verifyTransactionAsync = (transaction) => {
+    return new Promise(async function (resolve) {
+        var crypt = new JSEncrypt();
+
+        var transactionClone = {};
+        Object.assign(transactionClone, transaction);
+
+        if (transactionClone.publicKeyInput) // transfer
+            crypt.setKey(transactionClone.publicKeyInput);
+        else // registration
+            crypt.setKey(transactionClone.publicKeyOutput);
+
+        var signature = transactionClone.signature;
+        delete transactionClone.signature;
+
+        resolve({
+            valid: crypt.verify(transactionClone, signature, sha256)
+        });
+    });
+}
+
+export const sendTransaction = (transaction) => {
+    return (dispatch) => {
+        // send transaction to the blockchain, store it if offline
+    }
+}
+
+export const getTransactions = (limit = 0, skip = 0, publicKey = undefined, id = undefined) => {
+    return (dispatch) => {
+        // send request to the blockchain
+    }
+}
+
 const createTransactionRequest = () => {
     return {
         type: CREATE_TRANSACTION_REQUEST
@@ -68,6 +110,30 @@ const createTransactionSuccess = (transaction) => {
         type: CREATE_TRANSACTION_SUCCESS,
         payload: {
             ...transaction
+        }
+    }
+}
+
+const verifyTransactionRequest = () => {
+    return {
+        type: VERIFY_TRANSACTION_REQUEST
+    }
+}
+
+const verifyTransactionFailure = (error) => {
+    return {
+        type: VERIFY_TRANSACTION_FAILURE,
+        payload: {
+            error
+        }
+    }
+}
+
+const verifyTransactionSuccess = (valid) => {
+    return {
+        type: VERIFY_TRANSACTION_SUCCESS,
+        payload: {
+            ...valid
         }
     }
 }

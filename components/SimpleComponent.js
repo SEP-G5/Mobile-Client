@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { ScrollView, Text, Button } from 'react-native';
 import { getKeyPair, deleteKeyPair } from '../actions/KeyPairAction'
-import { createTransaction } from '../actions/TransactionAction'
+import { createTransaction, verifyTransaction } from '../actions/TransactionAction'
 
 class SimpleComponent extends Component {
 
@@ -18,6 +18,10 @@ class SimpleComponent extends Component {
         this.props.createTransaction("abc123", "", this.props.publicKey, this.props.privateKey);
     }
 
+    onPressVerifyTransaction() {
+        this.props.verifyTransaction(this.props.transaction);
+    }
+
     render() {
         return (
             <ScrollView>
@@ -25,13 +29,22 @@ class SimpleComponent extends Component {
                     title="Delete key pair"
                     onPress={this.onPressDelete.bind(this)}
                 />
-                <Text> {"\n"} {"\n"} </Text>
+                <Text> {"\n"} </Text>
                 <Button
                     title="Create register transaction"
                     onPress={this.onPressCreateRegisterTransaction.bind(this)}
                 />
-                <Text> {"\n"} {"\n"} </Text>
+                <Text> {"\n"} </Text>
+                <Button
+                    title="Verify transaction"
+                    onPress={this.onPressVerifyTransaction.bind(this)}
+                />
+                <Text> {"\n"} </Text>
                 <Text>
+                    <Text>
+                        {JSON.stringify(this.props.valid)}
+                    </Text>
+                    <Text> {"\n"} {"\n"} </Text>
                     <Text>
                         {JSON.stringify(this.props.transaction)}
                     </Text>
@@ -56,7 +69,8 @@ function mapStateToProps(state) {
         publicKey: state.get('keyPair').get('publicKey'),
         privateKey: state.get('keyPair').get('privateKey'),
         transaction: state.get('transaction').get('transaction'),
+        valid: state.get('transaction').get('valid'),
     };
 }
 
-export default connect(mapStateToProps, { getKeyPair, deleteKeyPair, createTransaction })(SimpleComponent);
+export default connect(mapStateToProps, { getKeyPair, deleteKeyPair, createTransaction, verifyTransaction })(SimpleComponent);
