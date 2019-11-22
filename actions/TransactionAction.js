@@ -1,4 +1,8 @@
 import { Cryptography } from '../services/CryptographyService';
+import { Peer } from '../services/PeerService';
+
+export const SEND_TRANSACTION_URL = '/transaction';
+export const GET_TRANSACTIONS_URL = '/transaction';
 
 export const CREATE_TRANSACTION_REQUEST = 'create_transaction_request';
 export const CREATE_TRANSACTION_FAILURE = 'create_transaction_failure';
@@ -75,13 +79,35 @@ const verifyTransactionAsync = (transaction) => {
 
 export const sendTransaction = (transaction) => {
     return (dispatch) => {
-        // send transaction to the blockchain, store it if offline
+        dispatch();
+        const request = {
+            method: 'post'
+        };
+        Peer.sendRequest(SEND_TRANSACTION_URL, request).then(function (response) {
+            dispatch();
+        }).catch(function (error) {
+            dispatch();
+        });
     }
 }
 
 export const getTransactions = (limit = 0, skip = 0, publicKey = undefined, id = undefined) => {
     return (dispatch) => {
-        // send request to the blockchain
+        dispatch();
+        const request = {
+            method: 'get',
+            query: {
+                limit: limit,
+                skip: skip,
+                publicKey: publicKey,
+                id: id,
+            }
+        };
+        Peer.sendRequest(SEND_TRANSACTION_URL, request).then(function (response) {
+            dispatch();
+        }).catch(function (error) {
+            dispatch();
+        });
     }
 }
 
