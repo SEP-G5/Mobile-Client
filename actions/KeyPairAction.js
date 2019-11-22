@@ -1,9 +1,5 @@
-import { JSEncrypt } from 'jsencrypt'
-import { AsyncStorage } from 'react-native';
-
-export const KEY_SIZE = 2048;
-export const PUBLIC_KEY = 'PUBLIC_KEY';
-export const PRIVATE_KEY = 'PRIVATE_KEY';
+import { Cryptography, PUBLIC_KEY, PRIVATE_KEY } from '../services/CryptographyService';
+import { Storage } from '../services/StorageService';
 
 export const GET_KEYPAIR_REQUEST = 'get_keypair_request';
 export const GET_KEYPAIR_FAILURE = 'get_keypair_failure';
@@ -56,8 +52,8 @@ export const deleteKeyPair = () => {
 }
 
 const getKeyPairAsync = async () => {
-    const publicKey = await AsyncStorage.getItem(PUBLIC_KEY);
-    const privateKey = await AsyncStorage.getItem(PRIVATE_KEY);
+    const publicKey = await Storage.get(PUBLIC_KEY);
+    const privateKey = await Storage.get(PRIVATE_KEY);
     if (publicKey === null || privateKey === null)
         return undefined;
     return {
@@ -68,25 +64,20 @@ const getKeyPairAsync = async () => {
 
 const createKeyPairAsync = () => {
     return new Promise(async function (resolve) {
-        var crypt = new JSEncrypt({ default_key_size: KEY_SIZE });
-
-        crypt.getKey(async function () {
-            const keyPair = {
-                publicKey: crypt.getPublicKey(),
-                privateKey: crypt.getPrivateKey(),
-            };
-
-            await AsyncStorage.setItem(PUBLIC_KEY, keyPair.publicKey);
-            await AsyncStorage.setItem(PRIVATE_KEY, keyPair.privateKey);
-
-            resolve(keyPair);
+        Cryptography.generateKeyPair().then(async function (keyPair) {
+            Storage.set(PUBLIC_KEY, keyPair.publicKey);
+            Storage.set(PRIVATE_KEY, keyPair.privateKey);
+            resolve({
+                publicKey: keyPair.publicKey,
+                privateKey: keyPair.privateKey,
+            });
         });
     });
 }
 
 const deleteKeyPairAsync = async () => {
-    await AsyncStorage.removeItem(PUBLIC_KEY);
-    await AsyncStorage.removeItem(PRIVATE_KEY);
+    await Storage.remove(PUBLIC_KEY);
+    await Storage.remove(PRIVATE_KEY);
 }
 
 const getKeyPairRequest = () => {

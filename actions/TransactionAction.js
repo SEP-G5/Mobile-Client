@@ -1,5 +1,4 @@
-import { JSEncrypt } from 'jsencrypt'
-import sha256 from 'crypto-js/sha256';
+import { Cryptography } from '../services/CryptographyService';
 
 export const CREATE_TRANSACTION_REQUEST = 'create_transaction_request';
 export const CREATE_TRANSACTION_FAILURE = 'create_transaction_failure';
@@ -34,10 +33,6 @@ export const verifyTransaction = (transaction) => {
 
 const createTransactionAsync = (id, publicKeyInput, publicKeyOutput, privateKey) => {
     return new Promise(async function (resolve) {
-        var crypt = new JSEncrypt();
-
-        crypt.setKey(privateKey);
-
         var date = new Date();
         var transaction = {
             id: id,
@@ -46,34 +41,34 @@ const createTransactionAsync = (id, publicKeyInput, publicKeyOutput, privateKey)
             timestamp: Math.round(date.getTime() / 1000)
         };
 
-        var signature = crypt.sign(transaction, sha256);
-
-        transaction = {
-            ...transaction,
-            signature: signature
-        }
-
-        resolve(transaction);
+        Cryptography.sign(privateKey, transaction).then(function (signature) {
+            resolve({
+                ...transaction,
+                signature: signature
+            });
+        });
     });
 }
 
 const verifyTransactionAsync = (transaction) => {
     return new Promise(async function (resolve) {
-        var crypt = new JSEncrypt();
-
         var transactionClone = {};
         Object.assign(transactionClone, transaction);
 
+        var key = "";
         if (transactionClone.publicKeyInput) // transfer
-            crypt.setKey(transactionClone.publicKeyInput);
+            key = transactionClone.publicKeyInput;
         else // registration
-            crypt.setKey(transactionClone.publicKeyOutput);
+            key = transactionClone.publicKeyOutput;
 
         var signature = transactionClone.signature;
         delete transactionClone.signature;
 
-        resolve({
-            valid: crypt.verify(transactionClone, signature, sha256)
+        Cryptography.verify(key, signature, transactionClone).then(function (valid) {
+
+            resolve({
+                valid: valid
+            });
         });
     });
 }
