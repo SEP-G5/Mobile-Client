@@ -10,6 +10,12 @@ export const CREATE_TRANSACTION_SUCCESS = 'create_transaction_success';
 export const VERIFY_TRANSACTION_REQUEST = 'verify_transaction_request';
 export const VERIFY_TRANSACTION_FAILURE = 'verify_transaction_failure';
 export const VERIFY_TRANSACTION_SUCCESS = 'verify_transaction_success';
+export const SEND_TRANSACTION_REQUEST = 'send_transaction_request';
+export const SEND_TRANSACTION_FAILURE = 'send_transaction_failure';
+export const SEND_TRANSACTION_SUCCESS = 'send_transaction_success';
+export const GET_TRANSACTIONS_REQUEST = 'get_transactions_request';
+export const GET_TRANSACTIONS_FAILURE = 'get_transactions_failure';
+export const GET_TRANSACTIONS_SUCCESS = 'get_transactions_success';
 
 export const createTransaction = (id, publicKeyInput, publicKeyOutput, privateKey) => {
     return (dispatch) => {
@@ -79,21 +85,23 @@ const verifyTransactionAsync = (transaction) => {
 
 export const sendTransaction = (transaction) => {
     return (dispatch) => {
-        dispatch();
+        dispatch(sendTransactionRequest());
         const request = {
-            method: 'post'
+            method: 'post',
+            data: transaction
         };
         Peer.sendRequest(SEND_TRANSACTION_URL, request).then(function (response) {
-            dispatch();
+            dispatch(sendTransactionSuccess());
         }).catch(function (error) {
-            dispatch();
+            dispatch(sendTransactionFailure(error));
+            // if it is due to missing peers or no internet connection, save the transaction
         });
     }
 }
 
 export const getTransactions = (limit = 0, skip = 0, publicKey = undefined, id = undefined) => {
     return (dispatch) => {
-        dispatch();
+        dispatch(getTransactionsRequest());
         const request = {
             method: 'get',
             query: {
@@ -104,9 +112,9 @@ export const getTransactions = (limit = 0, skip = 0, publicKey = undefined, id =
             }
         };
         Peer.sendRequest(SEND_TRANSACTION_URL, request).then(function (response) {
-            dispatch();
+            dispatch(getTransactionsSuccess());
         }).catch(function (error) {
-            dispatch();
+            dispatch(getTransactionsFailure());
         });
     }
 }
@@ -155,6 +163,51 @@ const verifyTransactionSuccess = (valid) => {
         type: VERIFY_TRANSACTION_SUCCESS,
         payload: {
             ...valid
+        }
+    }
+}
+
+const sendTransactionRequest = () => {
+    return {
+        type: SEND_TRANSACTION_REQUEST
+    }
+}
+
+const sendTransactionFailure = (error) => {
+    return {
+        type: SEND_TRANSACTION_FAILURE,
+        payload: {
+            error
+        }
+    }
+}
+
+const sendTransactionSuccess = () => {
+    return {
+        type: SEND_TRANSACTION_SUCCESS
+    }
+}
+
+const getTransactionsRequest = () => {
+    return {
+        type: GET_TRANSACTIONS_REQUEST
+    }
+}
+
+const getTransactionsFailure = (error) => {
+    return {
+        type: GET_TRANSACTIONS_FAILURE,
+        payload: {
+            error
+        }
+    }
+}
+
+const getTransactionsSuccess = (transactions) => {
+    return {
+        type: GET_TRANSACTIONS_SUCCESS,
+        payload: {
+            ...transactions
         }
     }
 }
