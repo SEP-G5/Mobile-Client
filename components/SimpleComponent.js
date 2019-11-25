@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { ScrollView, Text, Button } from 'react-native';
 import { getKeyPair, deleteKeyPair } from '../actions/KeyPairAction'
-import { createTransaction, verifyTransaction } from '../actions/TransactionAction'
+import { createTransaction, verifyTransaction, sendTransaction } from '../actions/TransactionAction'
 
 class SimpleComponent extends Component {
 
@@ -22,6 +22,10 @@ class SimpleComponent extends Component {
         this.props.verifyTransaction(this.props.transaction);
     }
 
+    onPressSendTransaction() {
+        this.props.sendTransaction(this.props.transaction);
+    }
+
     render() {
         return (
             <ScrollView>
@@ -38,6 +42,11 @@ class SimpleComponent extends Component {
                 <Button
                     title="Verify transaction"
                     onPress={this.onPressVerifyTransaction.bind(this)}
+                />
+                <Text> {"\n"} </Text>
+                <Button
+                    title="Send transaction"
+                    onPress={this.onPressSendTransaction.bind(this)}
                 />
                 <Text> {"\n"} </Text>
                 <Text>
@@ -73,4 +82,4 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps, { getKeyPair, deleteKeyPair, createTransaction, verifyTransaction })(SimpleComponent);
+export default connect(mapStateToProps, { getKeyPair, deleteKeyPair, createTransaction, verifyTransaction, sendTransaction })(SimpleComponent);

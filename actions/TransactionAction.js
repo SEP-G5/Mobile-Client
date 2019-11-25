@@ -95,6 +95,13 @@ export const sendTransaction = (transaction) => {
         }).catch(function (error) {
             dispatch(sendTransactionFailure(error));
             // if it is due to missing peers or no internet connection, save the transaction
+            if (error.response) {
+                console.log(error.response.data);
+                console.log(error.response.status);
+                console.log(error.response.headers);
+            } else if (error) {
+                // save the transaction
+            }
         });
     }
 }
