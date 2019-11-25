@@ -6,6 +6,10 @@ import {Button, Overlay} from 'react-native-elements';
 
 class KeyPairScreen extends Component {
 
+  componentDidMount(){
+    this.props.getKeyPair();
+  }
+
   onPressDelete() {
     this.props.deleteKeyPair();
   }
@@ -15,30 +19,46 @@ class KeyPairScreen extends Component {
     this.props.setViewKey(!viewKey);
   }
 
+  onPressCreate(){
+    this.props.getKeyPair();
+  }
+
   render(){
+    const {viewKey, publicKey, privateKey} = this.props;
     return (
       <View style={styles.container}>
         <Text style={styles.title}>Key Pair Management</Text>
         <View style={styles.optionsContainer}>
           <Button
+            disabled={(publicKey === "" || privateKey === "")}
             title="Show Key"
             onPress={this.onPressView.bind(this)}
           />
           <Text>{"\n"}</Text>
+          {(publicKey === "" || privateKey === "")?
+            <Button
+              title="Create Key"
+              onPress={this.onPressCreate.bind(this)}
+            />: <Text/>
+          }
+          {(publicKey === "" || privateKey === "")?
+            <Text>{"\n"}</Text>: <Text/>
+          }
           <Button
+            disabled={(publicKey === "" || privateKey === "")}
             title="Delete Key"
             onPress={this.onPressDelete.bind(this)}
           />
         </View>
-        <Overlay isVisible={this.props.viewKey}>
+        <Overlay isVisible={viewKey}>
           <View style={{flex:1}}>
             <ScrollView>
               <Text>
-                {this.props.publicKey}
+                {publicKey}
               </Text>
               <Text> {"\n"} {"\n"} </Text>
               <Text>
-                {this.props.privateKey}
+                {privateKey}
               </Text>
             </ScrollView>
             <Button

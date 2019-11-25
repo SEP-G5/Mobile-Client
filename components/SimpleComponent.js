@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { ScrollView, Text, Button } from 'react-native';
-import { getKeyPair, deleteKeyPair } from '../actions/KeyPairAction'
+import { getKeyPair } from '../actions/KeyPairAction'
 import { createTransaction, verifyTransaction } from '../actions/TransactionAction'
 
 class SimpleComponent extends Component {
