@@ -39,14 +39,6 @@ class SimpleComponent extends Component {
                     <Text>
                         {JSON.stringify(this.props.transaction)}
                     </Text>
-                    <Text> {"\n"} {"\n"} </Text>
-                    <Text>
-                        {this.props.publicKey}
-                    </Text>
-                    <Text> {"\n"} {"\n"} </Text>
-                    <Text>
-                        {this.props.privateKey}
-                    </Text>
                 </Text>
             </ScrollView>
         );

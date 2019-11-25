@@ -10,6 +10,7 @@ export const CREATE_KEYPAIR_SUCCESS = 'create_keypair_success';
 export const DELETE_KEYPAIR_REQUEST = 'delete_keypair_request';
 export const DELETE_KEYPAIR_FAILURE = 'delete_keypair_failure';
 export const DELETE_KEYPAIR_SUCCESS = 'delete_keypair_success';
+export const SET_VIEW_KEY = 'set_view_key';
 
 export const getKeyPair = () => {
     return (dispatch) => {
@@ -146,5 +147,17 @@ const deleteKeyPairFailure = (error) => {
 const deleteKeyPairSuccess = () => {
     return {
         type: DELETE_KEYPAIR_SUCCESS
+    }
+}
+
+/**
+ * Function that sets the value to show or not the key to the user.
+ * @param value FALSE / TRUE to show the key.
+ * @returns {{type: string, payload: *}}
+ */
+export const setViewKey = (value) => {
+    return {
+        type: SET_VIEW_KEY,
+        payload: value
     }
 }
