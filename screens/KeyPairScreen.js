@@ -31,19 +31,21 @@ class KeyPairScreen extends Component {
           />
         </View>
         <Overlay isVisible={this.props.viewKey}>
-          <ScrollView>
-            <Text>
-              {this.props.publicKey}
-            </Text>
-            <Text> {"\n"} {"\n"} </Text>
-            <Text>
-              {this.props.privateKey}
-            </Text>
-          </ScrollView>
-          <Button
-            title="Close"
-            onPress={this.onPressView.bind(this)}
-          />
+          <View style={{flex:1}}>
+            <ScrollView>
+              <Text>
+                {this.props.publicKey}
+              </Text>
+              <Text> {"\n"} {"\n"} </Text>
+              <Text>
+                {this.props.privateKey}
+              </Text>
+            </ScrollView>
+            <Button
+              title="Close"
+              onPress={this.onPressView.bind(this)}
+            />
+          </View>
         </Overlay>
       </View>
     );
