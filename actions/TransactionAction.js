@@ -88,10 +88,13 @@ export const sendTransaction = (transaction) => {
         dispatch(sendTransactionRequest());
         const request = {
             method: 'post',
-            data: transaction
+            data: JSON.stringify(transaction),   
+            headers: {
+                'Content-Type': 'application/json'
+            },
         };
         Peer.sendRequest(SEND_TRANSACTION_URL, request).then(function (response) {
-            dispatch(sendTransactionSuccess());
+            dispatch(sendTransactionSuccess(response));
         }).catch(function (error) {
             dispatch(sendTransactionFailure(error));
             // if it is due to missing peers or no internet connection, save the transaction
@@ -189,7 +192,7 @@ const sendTransactionFailure = (error) => {
     }
 }
 
-const sendTransactionSuccess = () => {
+const sendTransactionSuccess = (response) => {
     return {
         type: SEND_TRANSACTION_SUCCESS
     }
