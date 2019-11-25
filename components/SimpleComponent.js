@@ -10,10 +10,6 @@ class SimpleComponent extends Component {
         this.props.getKeyPair();
     }
 
-    onPressDelete() {
-        this.props.deleteKeyPair();
-    }
-
     onPressCreateRegisterTransaction() {
         this.props.createTransaction("abc123", "", this.props.publicKey, this.props.privateKey);
     }
@@ -25,11 +21,6 @@ class SimpleComponent extends Component {
     render() {
         return (
             <ScrollView>
-                <Button
-                    title="Delete key pair"
-                    onPress={this.onPressDelete.bind(this)}
-                />
-                <Text> {"\n"} </Text>
                 <Button
                     title="Create register transaction"
                     onPress={this.onPressCreateRegisterTransaction.bind(this)}
@@ -73,4 +64,4 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps, { getKeyPair, deleteKeyPair, createTransaction, verifyTransaction })(SimpleComponent);
+export default connect(mapStateToProps, { getKeyPair, createTransaction, verifyTransaction })(SimpleComponent);
