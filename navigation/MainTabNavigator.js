@@ -6,6 +6,7 @@ import TabBarIcon from '../components/TabBarIcon';
 import WelcomeScreen from '../screens/WelcomeScreen';
 import KeyPairScreen from '../screens/KeyPairScreen';
 import TransactionScreen from '../screens/TransactionScreen';
+import ScannerScreen from '../screens/ScannerScreen';
 
 const config = Platform.select({
     web: { headerMode: 'screen' },
@@ -13,7 +14,10 @@ const config = Platform.select({
 });
 
 const WelcomeStack = createStackNavigator(
-    {Home: WelcomeScreen},
+    {
+      Home: WelcomeScreen,
+      Scanner: ScannerScreen
+    },
     config
 );
 
@@ -51,7 +55,7 @@ KeyPairStack.navigationOptions = {
 };
 
 const TransactionStack = createStackNavigator(
-  {Key: TransactionScreen},
+  {Transaction: TransactionScreen},
   config
 )
 
@@ -68,7 +72,6 @@ TransactionStack.navigationOptions = {
     />
   ),
 };
-
 
 export default createBottomTabNavigator({
   WelcomeStack,
