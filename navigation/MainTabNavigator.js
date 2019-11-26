@@ -5,6 +5,7 @@ import { createStackNavigator, createBottomTabNavigator } from 'react-navigation
 import TabBarIcon from '../components/TabBarIcon';
 import WelcomeScreen from '../screens/WelcomeScreen';
 import KeyPairScreen from '../screens/KeyPairScreen';
+import TransactionScreen from '../screens/TransactionScreen';
 
 const config = Platform.select({
     web: { headerMode: 'screen' },
@@ -49,8 +50,28 @@ KeyPairStack.navigationOptions = {
   ),
 };
 
+const TransactionStack = createStackNavigator(
+  {Key: TransactionScreen},
+  config
+)
+
+TransactionStack.navigationOptions = {
+  tabBarLabel: 'Transactions',
+  tabBarIcon: ({ focused }) => (
+    <TabBarIcon
+      focused={focused}
+      name={
+        Platform.OS === 'ios'
+          ? `ios-list`
+          : 'md-list'
+      }
+    />
+  ),
+};
+
 
 export default createBottomTabNavigator({
   WelcomeStack,
-  KeyPairStack
+  KeyPairStack,
+  TransactionStack
 });

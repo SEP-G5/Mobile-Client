@@ -6,6 +6,10 @@ import {Button, Overlay} from 'react-native-elements';
 
 class KeyPairScreen extends Component {
 
+  static navigationOptions = {
+    title: 'Key Management',
+  };
+
   componentDidMount(){
     this.props.getKeyPair();
   }
@@ -27,7 +31,6 @@ class KeyPairScreen extends Component {
     const {viewKey, publicKey, privateKey} = this.props;
     return (
       <View style={styles.container}>
-        <Text style={styles.title}>Key Pair Management</Text>
         <View style={styles.optionsContainer}>
           <Button
             disabled={(publicKey === "" || privateKey === "")}
@@ -81,7 +84,6 @@ const mapStateToProps = (state) => ({
 
 const styles = StyleSheet.create({
   container: {flex:1, padding:10},
-  title: {fontSize: 22, textAlign: 'center'},
   optionsContainer: {flex:1, justifyContent:'center'}
 })
 
