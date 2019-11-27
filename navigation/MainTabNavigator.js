@@ -4,6 +4,9 @@ import { createStackNavigator, createBottomTabNavigator } from 'react-navigation
 
 import TabBarIcon from '../components/TabBarIcon';
 import WelcomeScreen from '../screens/WelcomeScreen';
+import KeyPairScreen from '../screens/KeyPairScreen';
+import TransactionScreen from '../screens/TransactionScreen';
+import ScannerScreen from '../screens/ScannerScreen';
 
 const config = Platform.select({
     web: { headerMode: 'screen' },
@@ -12,7 +15,8 @@ const config = Platform.select({
 
 const WelcomeStack = createStackNavigator(
     {
-        Home: WelcomeScreen,
+      Home: WelcomeScreen,
+      Scanner: ScannerScreen
     },
     config
 );
@@ -31,7 +35,46 @@ WelcomeStack.navigationOptions = {
     ),
 };
 
+const KeyPairStack = createStackNavigator(
+  {Key: KeyPairScreen},
+  config
+)
+
+KeyPairStack.navigationOptions = {
+  tabBarLabel: 'Key',
+  tabBarIcon: ({ focused }) => (
+    <TabBarIcon
+      focused={focused}
+      name={
+        Platform.OS === 'ios'
+          ? `ios-key`
+          : 'md-key'
+      }
+    />
+  ),
+};
+
+const TransactionStack = createStackNavigator(
+  {Transaction: TransactionScreen},
+  config
+)
+
+TransactionStack.navigationOptions = {
+  tabBarLabel: 'Transactions',
+  tabBarIcon: ({ focused }) => (
+    <TabBarIcon
+      focused={focused}
+      name={
+        Platform.OS === 'ios'
+          ? `ios-list`
+          : 'md-list'
+      }
+    />
+  ),
+};
 
 export default createBottomTabNavigator({
-    WelcomeStack
+  WelcomeStack,
+  KeyPairStack,
+  TransactionStack
 });

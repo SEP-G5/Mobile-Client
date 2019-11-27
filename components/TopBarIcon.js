@@ -1,0 +1,15 @@
+import React from 'react';
+import { Ionicons } from '@expo/vector-icons';
+
+import Colors from '../constants/Colors';
+
+export default function TopBarIcon(props) {
+  return (
+    <Ionicons
+      name={props.name}
+      size={26}
+      style={{ marginRight: 15 }}
+      color={props.focused ? Colors.tabIconSelected : Colors.tabIconDefault}
+    />
+  );
+}

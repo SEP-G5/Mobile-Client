@@ -8,7 +8,8 @@ import {
     CREATE_KEYPAIR_SUCCESS,
     DELETE_KEYPAIR_REQUEST,
     DELETE_KEYPAIR_FAILURE,
-    DELETE_KEYPAIR_SUCCESS
+    DELETE_KEYPAIR_SUCCESS,
+    SET_VIEW_KEY
 } from '../actions/KeyPairAction'
 
 const initialState = Immutable.fromJS({
@@ -16,7 +17,8 @@ const initialState = Immutable.fromJS({
     privateKey: "",
     created: false,
     loading: false,
-    error: undefined
+    error: undefined,
+    viewKey: false
 });
 
 export default (state = initialState, action) => {
@@ -48,6 +50,8 @@ export default (state = initialState, action) => {
                 .set('created', false)
                 .set('publicKey', "")
                 .set('privateKey', "");
+      case SET_VIEW_KEY:
+            return state.set('viewKey', action.payload)
         default:
             return state;
     }

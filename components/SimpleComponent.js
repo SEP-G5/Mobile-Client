@@ -1,17 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { ScrollView, Text, Button } from 'react-native';
-import { getKeyPair, deleteKeyPair } from '../actions/KeyPairAction'
+import { getKeyPair } from '../actions/KeyPairAction'
 import { createTransaction, verifyTransaction } from '../actions/TransactionAction'
 
 class SimpleComponent extends Component {
 
     componentDidMount() {
         this.props.getKeyPair();
-    }
-
-    onPressDelete() {
-        this.props.deleteKeyPair();
     }
 
     onPressCreateRegisterTransaction() {
@@ -25,11 +21,6 @@ class SimpleComponent extends Component {
     render() {
         return (
             <ScrollView>
-                <Button
-                    title="Delete key pair"
-                    onPress={this.onPressDelete.bind(this)}
-                />
-                <Text> {"\n"} </Text>
                 <Button
                     title="Create register transaction"
                     onPress={this.onPressCreateRegisterTransaction.bind(this)}
@@ -48,14 +39,6 @@ class SimpleComponent extends Component {
                     <Text>
                         {JSON.stringify(this.props.transaction)}
                     </Text>
-                    <Text> {"\n"} {"\n"} </Text>
-                    <Text>
-                        {this.props.publicKey}
-                    </Text>
-                    <Text> {"\n"} {"\n"} </Text>
-                    <Text>
-                        {this.props.privateKey}
-                    </Text>
                 </Text>
             </ScrollView>
         );
@@ -73,4 +56,4 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps, { getKeyPair, deleteKeyPair, createTransaction, verifyTransaction })(SimpleComponent);
+export default connect(mapStateToProps, { getKeyPair, createTransaction, verifyTransaction })(SimpleComponent);
