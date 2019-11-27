@@ -10,10 +10,6 @@ class SimpleComponent extends Component {
         this.props.getKeyPair();
     }
 
-    onPressDelete() {
-        this.props.deleteKeyPair();
-    }
-
     onPressCreateRegisterTransaction() {
         this.props.createTransaction("abc123", "", this.props.publicKey, this.props.privateKey);
     }
@@ -29,11 +25,6 @@ class SimpleComponent extends Component {
     render() {
         return (
             <ScrollView>
-                <Button
-                    title="Delete key pair"
-                    onPress={this.onPressDelete.bind(this)}
-                />
-                <Text> {"\n"} </Text>
                 <Button
                     title="Create register transaction"
                     onPress={this.onPressCreateRegisterTransaction.bind(this)}
@@ -56,14 +47,6 @@ class SimpleComponent extends Component {
                     <Text> {"\n"} {"\n"} </Text>
                     <Text>
                         {JSON.stringify(this.props.transaction)}
-                    </Text>
-                    <Text> {"\n"} {"\n"} </Text>
-                    <Text>
-                        {this.props.publicKey}
-                    </Text>
-                    <Text> {"\n"} {"\n"} </Text>
-                    <Text>
-                        {this.props.privateKey}
                     </Text>
                 </Text>
             </ScrollView>
