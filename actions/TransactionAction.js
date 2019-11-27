@@ -1,5 +1,8 @@
 import { Cryptography } from '../services/CryptographyService';
 import { Peer } from '../services/PeerService';
+import { Storage } from '../services/StorageService';
+
+export const STORAGE_TRANSACTIONS = 'transactions';
 
 export const SEND_TRANSACTION_URL = '/transaction';
 export const GET_TRANSACTIONS_URL = '/transaction';
@@ -16,6 +19,9 @@ export const SEND_TRANSACTION_SUCCESS = 'send_transaction_success';
 export const GET_TRANSACTIONS_REQUEST = 'get_transactions_request';
 export const GET_TRANSACTIONS_FAILURE = 'get_transactions_failure';
 export const GET_TRANSACTIONS_SUCCESS = 'get_transactions_success';
+export const SAVE_TRANSACTION_REQUEST = 'save_transaction_request';
+export const SAVE_TRANSACTION_FAILURE = 'save_transaction_failure';
+export const SAVE_TRANSACTION_SUCCESS = 'save_transaction_success';
 
 export const createTransaction = (id, publicKeyInput, publicKeyOutput, privateKey) => {
     return (dispatch) => {
@@ -88,7 +94,7 @@ export const sendTransaction = (transaction) => {
         dispatch(sendTransactionRequest());
         const request = {
             method: 'post',
-            data: JSON.stringify(transaction),   
+            data: JSON.stringify(transaction),
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -104,9 +110,43 @@ export const sendTransaction = (transaction) => {
                 console.log(error.response.headers);
             } else if (error) {
                 // save the transaction
+                dispatch(saveTransaction(transaction));
             }
         });
     }
+}
+
+export const saveTransaction = (transaction) => {
+    return (dispatch) => {
+        dispatch(saveTransactionRequest());
+        saveTransactionAsync(transaction).then(function () {
+            dispatch(saveTransactionSuccess());
+        }).catch(function (error) {
+            dispatch(saveTransactionFailure(error));
+        });
+    }
+}
+
+const saveTransactionAsync = (transaction) => {
+    return new Promise(async function (resolve) {
+        let pendingTransactionsString = await Storage.get(STORAGE_TRANSACTIONS);
+        let pendingTransactions = [] 
+        try {
+            pendingTransactions = JSON.parse(pendingTransactionsString)
+        } catch(e) {
+            console.log(e);
+        }
+        if (!Array.isArray(pendingTransactions))
+            pendingTransactions = []
+        if (pendingTransactions.includes(transaction)) // already saved
+            resolve();
+        pendingTransactions.push(transaction);
+        Storage.set(STORAGE_TRANSACTIONS, JSON.stringify(pendingTransactions)).then(function () {
+            resolve();
+        }).catch(function (error) {
+            resolve(error);
+        })
+    });
 }
 
 export const getTransactions = (limit = 0, skip = 0, publicKey = undefined, id = undefined) => {
@@ -219,5 +259,26 @@ const getTransactionsSuccess = (transactions) => {
         payload: {
             ...transactions
         }
+    }
+}
+
+const saveTransactionRequest = () => {
+    return {
+        type: SAVE_TRANSACTION_REQUEST
+    }
+}
+
+const saveTransactionFailure = (error) => {
+    return {
+        type: SAVE_TRANSACTION_FAILURE,
+        payload: {
+            error
+        }
+    }
+}
+
+const saveTransactionSuccess = () => {
+    return {
+        type: SAVE_TRANSACTION_SUCCESS,
     }
 }
