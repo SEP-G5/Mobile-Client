@@ -1,4 +1,11 @@
 import { Cryptography } from '../services/CryptographyService';
+import { Peer } from '../services/PeerService';
+import { Storage } from '../services/StorageService';
+
+export const STORAGE_TRANSACTIONS = 'transactions';
+
+export const SEND_TRANSACTION_URL = '/transaction';
+export const GET_TRANSACTIONS_URL = '/transaction';
 
 export const CREATE_TRANSACTION_REQUEST = 'create_transaction_request';
 export const CREATE_TRANSACTION_FAILURE = 'create_transaction_failure';
@@ -6,6 +13,15 @@ export const CREATE_TRANSACTION_SUCCESS = 'create_transaction_success';
 export const VERIFY_TRANSACTION_REQUEST = 'verify_transaction_request';
 export const VERIFY_TRANSACTION_FAILURE = 'verify_transaction_failure';
 export const VERIFY_TRANSACTION_SUCCESS = 'verify_transaction_success';
+export const SEND_TRANSACTION_REQUEST = 'send_transaction_request';
+export const SEND_TRANSACTION_FAILURE = 'send_transaction_failure';
+export const SEND_TRANSACTION_SUCCESS = 'send_transaction_success';
+export const GET_TRANSACTIONS_REQUEST = 'get_transactions_request';
+export const GET_TRANSACTIONS_FAILURE = 'get_transactions_failure';
+export const GET_TRANSACTIONS_SUCCESS = 'get_transactions_success';
+export const SAVE_TRANSACTION_REQUEST = 'save_transaction_request';
+export const SAVE_TRANSACTION_FAILURE = 'save_transaction_failure';
+export const SAVE_TRANSACTION_SUCCESS = 'save_transaction_success';
 
 export const createTransaction = (id, publicKeyInput, publicKeyOutput, privateKey) => {
     return (dispatch) => {
@@ -75,13 +91,81 @@ const verifyTransactionAsync = (transaction) => {
 
 export const sendTransaction = (transaction) => {
     return (dispatch) => {
-        // send transaction to the blockchain, store it if offline
+        dispatch(sendTransactionRequest());
+        const request = {
+            method: 'post',
+            data: JSON.stringify(transaction),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        };
+        Peer.sendRequest(SEND_TRANSACTION_URL, request).then(function (response) {
+            dispatch(sendTransactionSuccess(response));
+        }).catch(function (error) {
+            dispatch(sendTransactionFailure(error));
+            // if it is due to missing peers or no internet connection, save the transaction
+            if (error.response) {
+                console.log(error.response.data);
+                console.log(error.response.status);
+                console.log(error.response.headers);
+            } else if (error) {
+                // save the transaction
+                dispatch(saveTransaction(transaction));
+            }
+        });
     }
+}
+
+export const saveTransaction = (transaction) => {
+    return (dispatch) => {
+        dispatch(saveTransactionRequest());
+        saveTransactionAsync(transaction).then(function () {
+            dispatch(saveTransactionSuccess());
+        }).catch(function (error) {
+            dispatch(saveTransactionFailure(error));
+        });
+    }
+}
+
+const saveTransactionAsync = (transaction) => {
+    return new Promise(async function (resolve) {
+        let pendingTransactionsString = await Storage.get(STORAGE_TRANSACTIONS);
+        let pendingTransactions = [] 
+        try {
+            pendingTransactions = JSON.parse(pendingTransactionsString)
+        } catch(e) {
+            console.log(e);
+        }
+        if (!Array.isArray(pendingTransactions))
+            pendingTransactions = []
+        if (pendingTransactions.includes(transaction)) // already saved
+            resolve();
+        pendingTransactions.push(transaction);
+        Storage.set(STORAGE_TRANSACTIONS, JSON.stringify(pendingTransactions)).then(function () {
+            resolve();
+        }).catch(function (error) {
+            resolve(error);
+        })
+    });
 }
 
 export const getTransactions = (limit = 0, skip = 0, publicKey = undefined, id = undefined) => {
     return (dispatch) => {
-        // send request to the blockchain
+        dispatch(getTransactionsRequest());
+        const request = {
+            method: 'get',
+            query: {
+                limit: limit,
+                skip: skip,
+                publicKey: publicKey,
+                id: id,
+            }
+        };
+        Peer.sendRequest(SEND_TRANSACTION_URL, request).then(function (response) {
+            dispatch(getTransactionsSuccess());
+        }).catch(function (error) {
+            dispatch(getTransactionsFailure());
+        });
     }
 }
 
@@ -130,5 +214,71 @@ const verifyTransactionSuccess = (valid) => {
         payload: {
             ...valid
         }
+    }
+}
+
+const sendTransactionRequest = () => {
+    return {
+        type: SEND_TRANSACTION_REQUEST
+    }
+}
+
+const sendTransactionFailure = (error) => {
+    return {
+        type: SEND_TRANSACTION_FAILURE,
+        payload: {
+            error
+        }
+    }
+}
+
+const sendTransactionSuccess = (response) => {
+    return {
+        type: SEND_TRANSACTION_SUCCESS
+    }
+}
+
+const getTransactionsRequest = () => {
+    return {
+        type: GET_TRANSACTIONS_REQUEST
+    }
+}
+
+const getTransactionsFailure = (error) => {
+    return {
+        type: GET_TRANSACTIONS_FAILURE,
+        payload: {
+            error
+        }
+    }
+}
+
+const getTransactionsSuccess = (transactions) => {
+    return {
+        type: GET_TRANSACTIONS_SUCCESS,
+        payload: {
+            ...transactions
+        }
+    }
+}
+
+const saveTransactionRequest = () => {
+    return {
+        type: SAVE_TRANSACTION_REQUEST
+    }
+}
+
+const saveTransactionFailure = (error) => {
+    return {
+        type: SAVE_TRANSACTION_FAILURE,
+        payload: {
+            error
+        }
+    }
+}
+
+const saveTransactionSuccess = () => {
+    return {
+        type: SAVE_TRANSACTION_SUCCESS,
     }
 }
