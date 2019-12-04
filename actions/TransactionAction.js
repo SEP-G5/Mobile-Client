@@ -22,6 +22,8 @@ export const GET_TRANSACTIONS_SUCCESS = 'get_transactions_success';
 export const SAVE_TRANSACTION_REQUEST = 'save_transaction_request';
 export const SAVE_TRANSACTION_FAILURE = 'save_transaction_failure';
 export const SAVE_TRANSACTION_SUCCESS = 'save_transaction_success';
+export const SET_CURRENT_IN_OVERLAY = 'set_current_in_overlay';
+export const SET_VIEW_DETAIL = 'set_view_detail';
 
 export const createTransaction = (id, publicKeyInput, publicKeyOutput, privateKey) => {
     return (dispatch) => {
@@ -282,3 +284,33 @@ const saveTransactionSuccess = () => {
         type: SAVE_TRANSACTION_SUCCESS,
     }
 }
+
+/**
+ * Set the transaction that is currently in the detail overlay.
+ * @param transaction
+ */
+export const setCurrentInOverlay = (transaction) => {
+  return (dispatch)  => {
+      dispatch(setViewDetail(true));
+      dispatch(setCurrentInOverlaySuccess(transaction));
+  }
+};
+
+const setCurrentInOverlaySuccess = (transaction) => {
+    return {
+        type: SET_CURRENT_IN_OVERLAY,
+        payload: transaction
+    }
+};
+
+/**
+ * Set boolean that show the BicycleDetail Component.
+ * @param value
+ * @returns {{type, payload: *}}
+ */
+export const setViewDetail = (value) => {
+    return {
+        type: SET_VIEW_DETAIL,
+        payload: value
+    }
+};
