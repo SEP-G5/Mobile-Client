@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import { View, StyleSheet, Text, ScrollView} from 'react-native';
 import { deleteKeyPair, getKeyPair, setViewKey } from '../actions/KeyPairAction';
 import {Button, Overlay} from 'react-native-elements';
+import QRCode from 'react-native-qrcode-svg';
 
 class KeyPairScreen extends Component {
 
@@ -55,15 +56,12 @@ class KeyPairScreen extends Component {
         </View>
         <Overlay isVisible={viewKey}>
           <View style={{flex:1}}>
-            <ScrollView>
-              <Text>
-                {publicKey}
-              </Text>
-              <Text> {"\n"} {"\n"} </Text>
-              <Text>
-                {privateKey}
-              </Text>
-            </ScrollView>
+            <View style={{flex:1,alignItems:'center', justifyContent:'center'}}>
+                <QRCode
+                  value={JSON.stringify(publicKey)}
+                  size={200}
+                />
+            </View>
             <Button
               title="Close"
               onPress={this.onPressView.bind(this)}
