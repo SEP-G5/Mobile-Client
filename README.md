@@ -16,6 +16,7 @@ In this system, there are two components, frontend and [backend](https://github.
 ```
 npm install
 expo install expo-random
+expo install react-native-svg
 ```
 
 ### Run
