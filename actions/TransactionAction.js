@@ -1,6 +1,10 @@
 import { Cryptography } from '../services/CryptographyService';
 import { Peer } from '../services/PeerService';
 import { Storage } from '../services/StorageService';
+import { Task } from '../services/TaskService';
+
+export const SEND_PENDING_TRANSACTIONS_INTERVAL = 60 * 60;
+export const SEND_PENDING_TRANSACTIONS_TASK = 'send_pending_transactions_task';
 
 export const STORAGE_TRANSACTIONS = 'transactions';
 
@@ -110,7 +114,11 @@ export const sendTransaction = (transaction) => {
                 console.log(error.response.headers);
             } else if (error) {
                 // save the transaction
-                dispatch(saveTransaction(transaction));
+                Task.register(SEND_PENDING_TRANSACTIONS_TASK, SEND_PENDING_TRANSACTIONS_INTERVAL).then(function () {
+                    dispatch(saveTransaction(transaction));
+                }).catch(function (error) {
+                    console.log(error);
+                });
             }
         });
     }
@@ -125,6 +133,34 @@ export const saveTransaction = (transaction) => {
             dispatch(saveTransactionFailure(error));
         });
     }
+}
+
+export const sendPendingTransactions = () => {
+    return new Promise(async function (resolve, reject) {
+        getPendingTransactionsAsync.then(function (transactions) {
+            transactions.forEach(async function (transaction) {
+                await saveTransactionAsync(transaction);
+            });
+            resolve();
+        }).catch(function (error) {
+            reject(error);
+        });
+    });
+}
+
+const getPendingTransactionsAsync = () => {
+    return new Promise(async function (resolve, reject) {
+        let pendingTransactionsString = await Storage.get(STORAGE_TRANSACTIONS);
+        let pendingTransactions = [];
+        try {
+            pendingTransactions = JSON.parse(pendingTransactionsString)
+        } catch(e) {
+            reject(e);
+        }
+        if (!Array.isArray(pendingTransactions))
+            pendingTransactions = []
+        resolve(pendingTransactions);
+    });
 }
 
 const saveTransactionAsync = (transaction) => {
