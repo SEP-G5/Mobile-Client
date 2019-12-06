@@ -128,23 +128,23 @@ export const saveTransaction = (transaction) => {
 }
 
 const saveTransactionAsync = (transaction) => {
-    return new Promise(async function (resolve) {
+    return new Promise(async function (resolve, reject) {
         let pendingTransactionsString = await Storage.get(STORAGE_TRANSACTIONS);
-        let pendingTransactions = [] 
+        let pendingTransactions = [];
         try {
             pendingTransactions = JSON.parse(pendingTransactionsString)
         } catch(e) {
-            console.log(e);
+            reject(e);
         }
         if (!Array.isArray(pendingTransactions))
             pendingTransactions = []
         if (pendingTransactions.includes(transaction)) // already saved
-            resolve();
+            reject(new Error('This transaction has already been saved.'));
         pendingTransactions.push(transaction);
         Storage.set(STORAGE_TRANSACTIONS, JSON.stringify(pendingTransactions)).then(function () {
             resolve();
         }).catch(function (error) {
-            resolve(error);
+            reject(error);
         })
     });
 }
