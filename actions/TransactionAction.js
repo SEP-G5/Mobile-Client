@@ -114,8 +114,8 @@ export const sendTransaction = (transaction) => {
                 console.log(error.response.headers);
             } else if (error) {
                 // save the transaction
+                dispatch(saveTransaction(transaction));
                 Task.register(SEND_PENDING_TRANSACTIONS_TASK, SEND_PENDING_TRANSACTIONS_INTERVAL).then(function () {
-                    dispatch(saveTransaction(transaction));
                 }).catch(function (error) {
                     console.log(error);
                 });
@@ -154,7 +154,7 @@ const getPendingTransactionsAsync = () => {
         let pendingTransactions = [];
         try {
             pendingTransactions = JSON.parse(pendingTransactionsString)
-        } catch(e) {
+        } catch (e) {
             reject(e);
         }
         if (!Array.isArray(pendingTransactions))
@@ -165,23 +165,18 @@ const getPendingTransactionsAsync = () => {
 
 const saveTransactionAsync = (transaction) => {
     return new Promise(async function (resolve, reject) {
-        let pendingTransactionsString = await Storage.get(STORAGE_TRANSACTIONS);
-        let pendingTransactions = [];
-        try {
-            pendingTransactions = JSON.parse(pendingTransactionsString)
-        } catch(e) {
-            reject(e);
-        }
-        if (!Array.isArray(pendingTransactions))
-            pendingTransactions = []
-        if (pendingTransactions.includes(transaction)) // already saved
-            reject(new Error('This transaction has already been saved.'));
-        pendingTransactions.push(transaction);
-        Storage.set(STORAGE_TRANSACTIONS, JSON.stringify(pendingTransactions)).then(function () {
-            resolve();
+        getPendingTransactionsAsync().then(function (pendingTransactions) {
+            if (pendingTransactions.includes(transaction)) // already saved
+                reject(new Error('This transaction has already been saved.'));
+            pendingTransactions.push(transaction);
+            Storage.set(STORAGE_TRANSACTIONS, JSON.stringify(pendingTransactions)).then(function () {
+                resolve();
+            }).catch(function (error) {
+                reject(error);
+            })
         }).catch(function (error) {
             reject(error);
-        })
+        });
     });
 }
 
