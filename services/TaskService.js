@@ -1,4 +1,5 @@
 import * as BackgroundFetch from 'expo-background-fetch';
+import { Platform } from 'react-native';
 
 class Task {
 
@@ -6,24 +7,28 @@ class Task {
         return new Promise(async function (resolve, reject) {
             if (Task.exists(taskName))
                 reject(new Error("The tasks is already existing"));
+            if (Platform.OS === "web")
+                reject(new Error("This platform is not supported"));
             const options = {
                 minimumInterval: interval,
                 stopOnTerminate: false,
                 startOnBoot: true,
             };
+
             BackgroundFetch.registerTaskAsync(taskName, options).then(function () {
                 resolve();
-            })
-                .catch(function (error) {
-                    reject(error);
-                });
+            }).catch(function (error) {
+                reject(error);
+            });
         });
     }
 
     static unregister(taskName) {
         return new Promise(async function (resolve, reject) {
             if (!Task.exists(taskName))
-                return;
+                reject(new Error("The tasks is already existing"));
+            if (Platform.OS === "web")
+                reject(new Error("This platform is not supported"));
             BackgroundFetch.unregisterTaskAsync(taskName).then(function () {
                 resolve();
             }).catch(function (error) {
@@ -33,7 +38,7 @@ class Task {
     }
 
     static exists() {
-        return true;
+        return false;
     }
 
 }
