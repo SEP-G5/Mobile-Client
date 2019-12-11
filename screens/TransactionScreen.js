@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import {View, FlatList, Text, SafeAreaView, StyleSheet} from 'react-native';
 import TopBarIcon from '../components/TopBarIcon';
 import { Platform } from 'react-native';
-import {ListItem} from 'react-native-elements';
+import {ListItem, Input} from 'react-native-elements';
 
 class TransactionScreen extends Component {
 
@@ -24,12 +24,17 @@ class TransactionScreen extends Component {
         chevron
       />
     );
-  }
+  };
 
   render () {
     return (
       <View style={{flex:1}}>
         <SafeAreaView style={styles.container}>
+          <Input
+              placeholder='Search...'
+              rightIcon={{ type: 'font-awesome', name: 'search' }}
+          />
+          <Text>{'\n'}</Text>
           <FlatList
             data={DATA}
             renderItem={({item}) => this.renderItem(item)}
