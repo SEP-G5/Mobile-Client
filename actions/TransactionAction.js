@@ -3,6 +3,7 @@ import { Peer } from '../services/PeerService';
 import { Storage } from '../services/StorageService';
 
 export const STORAGE_TRANSACTIONS = 'transactions';
+export const STORAGE_BIKES = 'bikes';
 
 export const SEND_TRANSACTION_URL = '/transaction';
 export const GET_TRANSACTIONS_URL = '/transaction';
@@ -132,10 +133,10 @@ export const saveTransaction = (transaction) => {
 const saveTransactionAsync = (transaction) => {
     return new Promise(async function (resolve) {
         let pendingTransactionsString = await Storage.get(STORAGE_TRANSACTIONS);
-        let pendingTransactions = [] 
+        let pendingTransactions = []
         try {
             pendingTransactions = JSON.parse(pendingTransactionsString)
-        } catch(e) {
+        } catch (e) {
             console.log(e);
         }
         if (!Array.isArray(pendingTransactions))
@@ -169,6 +170,63 @@ export const getTransactions = (limit = 0, skip = 0, publicKey = undefined, id =
             dispatch(getTransactionsFailure());
         });
     }
+}
+
+const getOwnedBikes = () => {
+    return new Promise(async function (resolve, reject) {
+        let ownedBikesString = await Storage.get(STORAGE_BIKES);
+        let ownedBikes = [];
+        try {
+            ownedBikes = JSON.parse(ownedBikesString)
+        } catch (e) {
+            reject(e);
+        }
+        if (!Array.isArray(ownedBikes))
+            ownedBikes = []
+        resolve(ownedBikes);
+    });
+}
+
+const refreshOwnedBikes = (publicKey) => {
+    return new Promise(async function (resolve, reject) {
+        let rejectedBikes = [];
+        let ownedBikes = [];
+        let currentTransactions = undefined;
+        let skip = 0;
+        const limit = 10;
+        while (currentTransactions != []) {
+            const request = {
+                method: 'get',
+                query: {
+                    limit: limit,
+                    skip: skip,
+                    publicKey: publicKey
+                }
+            };
+            try {
+                currentTransactions = await Peer.sendRequest(SEND_TRANSACTION_URL, request);
+                currentTransactions = currentTransactions.reverse();
+                currentTransactions.forEach(function (transaction) {
+                    if (rejectedBikes.includes(transaction.id) || ownedBikes.includes(transaction.id)) {
+                        return;
+                    }
+                    if (transaction.publicKeyOutput === publicKey) {
+                        ownedBikes.push(transaction.id);
+                    } else if (transaction.publicKeyInput === publicKey) {
+                        rejectedBikes.push(transaction.id);
+                    }
+                });
+                skip += limit;
+            } catch (e) {
+                reject(e);
+            }
+        }
+        Storage.set(STORAGE_BIKES, JSON.stringify(ownedBikes)).then(function () {
+            resolve();
+        }).catch(function (error) {
+            reject(error);
+        });
+    });
 }
 
 const createTransactionRequest = () => {
@@ -290,10 +348,10 @@ const saveTransactionSuccess = () => {
  * @param transaction
  */
 export const setCurrentInOverlay = (transaction) => {
-  return (dispatch)  => {
-      dispatch(setViewDetail(true));
-      dispatch(setCurrentInOverlaySuccess(transaction));
-  }
+    return (dispatch) => {
+        dispatch(setViewDetail(true));
+        dispatch(setCurrentInOverlaySuccess(transaction));
+    }
 };
 
 const setCurrentInOverlaySuccess = (transaction) => {
