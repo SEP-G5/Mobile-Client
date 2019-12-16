@@ -14,7 +14,7 @@ class DetailScreen extends Component {
                 <View style={{flex:1}}>
                     <Button
                         title="Transfer Ownership"
-                        onPress={() => this.props.navigation.navigate('Scanner')}
+                        onPress={() => this.props.navigation.navigate('Scanner',{item, next:'SendTransaction'})}
                     />
                 </View>
             </View>

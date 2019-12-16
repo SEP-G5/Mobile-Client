@@ -8,6 +8,7 @@ import KeyPairScreen from '../screens/KeyPairScreen';
 import TransactionScreen from '../screens/TransactionScreen';
 import ScannerScreen from '../screens/ScannerScreen';
 import DetailScreen from "../screens/DetailScreen";
+import SendTransactionScreen from "../screens/SendTransactionScreen";
 
 const config = Platform.select({
     web: { headerMode: 'screen' },
@@ -18,7 +19,8 @@ const WelcomeStack = createStackNavigator(
     {
       Home: WelcomeScreen,
       Detail: DetailScreen,
-      Scanner: ScannerScreen
+      Scanner: ScannerScreen,
+      SendTransaction: SendTransactionScreen
     },
     config
 );

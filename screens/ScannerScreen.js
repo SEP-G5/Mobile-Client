@@ -48,6 +48,16 @@ export default class ScannerScreen extends Component {
 
     handleBarCodeScanned = ({ type, data }) => {
         this.setState({ scanned: true });
-        alert(`Bar code with type ${type} and data ${data} has been scanned!`);
+        const {navigation} = this.props;
+        if (type === 'org.iso.QRCode'){
+            const item = navigation.getParam('item');
+            const nextScreen = navigation.getParam('next');
+            //send data to next screen.
+            if (item){
+                navigation.navigate(nextScreen, {item, data});
+            } else {
+                navigation.navigate(nextScreen, {data});
+            }
+        }
     };
 }
