@@ -18,7 +18,7 @@ class HomeScreen extends Component {
     };
 
   onPressItem = (item) => {
-      this.props.setCurrentInOverlay(item);
+      this.props.navigation.navigate('Detail', {item});
   };
 
   renderItem = (item) => {
