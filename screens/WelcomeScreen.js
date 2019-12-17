@@ -10,9 +10,9 @@ import _ from 'lodash';
 class HomeScreen extends Component {
   static navigationOptions = ({navigation}) => {
     return {
-        title: 'Home',
-        headerRight: <TouchableOpacity onPress={() => navigation.navigate('Scanner')}>
-          <TopBarIcon name={Platform.OS === 'ios'?`ios-camera`:'md-camera'}/>
+        title: 'My Bikes',
+        headerRight: <TouchableOpacity onPress={() => navigation.navigate('RegisterBike')}>
+          <TopBarIcon name={Platform.OS === 'ios'?`ios-add`:'md-add'}/>
         </TouchableOpacity>
       };
     };
@@ -41,7 +41,6 @@ class HomeScreen extends Component {
       <View style={{flex:1}}>
         <ScrollView>
           <SafeAreaView style={styles.container}>
-            <Text style={styles.title}> My Bikes </Text>
             <FlatList
               data={MY_BIKES}
               renderItem={({item}) => this.renderItem(item)}
@@ -54,23 +53,13 @@ class HomeScreen extends Component {
             onPress={ () => alert("Receive Bike")}
             style={{marginBottom:15, paddingLeft:5,paddingRight:5}}
         />
-        <BicycleDetail
-            current={this.props.current}
-            viewDetail={this.props.viewDetail}
-            closeF={this.props.setViewDetail}
-        />
       </View>
     );
   }
 
 }
 
-const mapStateToProps = (state) => ({
-    current: state.get('transaction').get('current'),
-    viewDetail: state.get('transaction').get('viewDetail')
-});
-
-export default connect(mapStateToProps, {setCurrentInOverlay, setViewDetail})(HomeScreen);
+export default HomeScreen
 
 const MY_BIKES = [
     {id: "JH4K3H5JDFJHDFJ34", name: "CITYCYKEL LÅGT INSTEG ELOPS 520 RÖD"},
@@ -80,7 +69,6 @@ const MY_BIKES = [
 
 const styles = StyleSheet.create({
   container: {flex:1},
-  title: {fontSize:24, paddingTop:10, paddingLeft:10},
   item: {flex:1,paddingTop:20, paddingBottom:20,backgroundColor:'#eee',marginBottom:2},
   itemTxt: {paddingLeft:5, color:'#000', fontSize: 18}
 });
