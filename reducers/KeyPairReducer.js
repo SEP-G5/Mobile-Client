@@ -39,6 +39,7 @@ export default (state = initialState, action) => {
                 .set('error', action.payload);
         case CREATE_KEYPAIR_SUCCESS:
         case GET_KEYPAIR_SUCCESS:
+            console.log(action.payload.publicKey);
             return state
                 .set('loading', false)
                 .set('created', true)

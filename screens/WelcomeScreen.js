@@ -1,10 +1,9 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {setCurrentInOverlay, setViewDetail} from "../actions/TransactionAction";
+import {getKeyPair} from "../actions/KeyPairAction";
 import TopBarIcon from '../components/TopBarIcon';
 import { Platform, TouchableOpacity, View, FlatList, Text, SafeAreaView, StyleSheet, ScrollView} from 'react-native';
 import {ListItem, Button} from 'react-native-elements';
-import BicycleDetail from './../components/BicycleDetail';
 import _ from 'lodash';
 
 class HomeScreen extends Component {
@@ -16,6 +15,10 @@ class HomeScreen extends Component {
         </TouchableOpacity>
       };
     };
+
+  componentDidMount() {
+      this.props.getKeyPair();
+  }
 
   onPressItem = (item) => {
       this.props.navigation.navigate('Detail', {item});
@@ -37,6 +40,14 @@ class HomeScreen extends Component {
   };
 
   render(){
+    const {loading} = this.props;
+
+    if (loading) {
+        return <View style={{flex:1, justifyContent:'center'}}>
+            <Text style={{fontSize:24, textAlign:'center'}}>Loading...</Text>
+        </View>
+    }
+
     return (
       <View style={{flex:1}}>
         <ScrollView>
@@ -59,7 +70,11 @@ class HomeScreen extends Component {
 
 }
 
-export default HomeScreen
+const mapStateToProps = (state) => ({
+   loading: state.get('keyPair').get('loading')
+});
+
+export default connect(mapStateToProps, {getKeyPair})(HomeScreen);
 
 const MY_BIKES = [
     {id: "JH4K3H5JDFJHDFJ34", name: "CITYCYKEL LÅGT INSTEG ELOPS 520 RÖD"},
