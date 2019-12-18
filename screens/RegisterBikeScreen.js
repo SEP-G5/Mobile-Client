@@ -13,7 +13,6 @@ class RegisterBikeScreen extends Component {
 
     componentWillReceiveProps(nextProps, nextContext) {
         const {transaction} = nextProps;
-        console.log(transaction);
         const {transaction: oldTransaction} = this.props;
         if (transaction.timestamp !== oldTransaction.timestamp){
             //If there is a new transaction to send... send it.

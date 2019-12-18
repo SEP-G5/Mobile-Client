@@ -1,5 +1,4 @@
 import sha256 from 'crypto-js/sha256';
-import Base64 from 'crypto-js/enc-base64';
 import CryptoJS from 'crypto-js';
 import * as Random from 'expo-random';
 import { eddsa } from 'elliptic';
@@ -15,8 +14,8 @@ class Cryptography {
             const ec = new eddsa('ed25519');
             const keys = ec.keyFromSecret(randomBytes);
             resolve({
-                publicKey: Base64.stringify(keys.getPublic()),
-                privateKey: Base64.stringify(keys.getSecret())
+                publicKey: keys.getPublic('hex'),
+                privateKey:keys.getSecret('hex')
             });
 
         });
@@ -25,17 +24,17 @@ class Cryptography {
     static sign(privateKey, data) {
         return new Promise(async function (resolve) {
             const ec = new eddsa('ed25519');
-            const key = ec.keyFromSecret(CryptoJS.enc.Base64.parse(privateKey));
+            const key = ec.keyFromSecret('hex');
             const hash = Cryptography.getDataHash(data);
-            const signature = key.sign(hash).toBytes();
-            resolve(Base64.stringify(CryptoJS.enc.Utf8.parse(signature)));
+            const signature = key.sign(hash).toHex();
+            resolve(signature);
         });
     }
 
     static verify(publicKey, signature, data) {
         return new Promise(async function (resolve) {
             const ec = new eddsa('ed25519');
-            const key = ec.keyFromPublic(publicKey);
+            const key = ec.keyFromPublic(publicKey, 'hex');
             const hash = Cryptography.getDataHash(data);
             const valid = key.verify(hash, signature);
             resolve(valid);
@@ -43,7 +42,7 @@ class Cryptography {
     }
 
     static getDataHash(data) {
-        return sha256(JSON.stringify(data)).toString(CryptoJS.enc.Base64);
+        return sha256(JSON.stringify(data)).toString(CryptoJS.enc.hex);
     }
 
 }
