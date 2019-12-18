@@ -24,6 +24,8 @@ export const SAVE_TRANSACTION_FAILURE = 'save_transaction_failure';
 export const SAVE_TRANSACTION_SUCCESS = 'save_transaction_success';
 export const SET_CURRENT_IN_OVERLAY = 'set_current_in_overlay';
 export const SET_VIEW_DETAIL = 'set_view_detail';
+export const SET_SN = 'set_sn';
+export const SET_NAME = 'set_name';
 
 export const createTransaction = (id, publicKeyInput, publicKeyOutput, privateKey) => {
     return (dispatch) => {
@@ -101,8 +103,14 @@ export const sendTransaction = (transaction) => {
                 'Content-Type': 'application/json'
             },
         };
+
         Peer.sendRequest(SEND_TRANSACTION_URL, request).then(function (response) {
-            dispatch(sendTransactionSuccess(response));
+            //We need to process the response
+            if (response.status === 200){
+                dispatch(sendTransactionSuccess(response));
+            } else {
+                dispatch(sendTransactionFailure(response));
+            }
         }).catch(function (error) {
             dispatch(sendTransactionFailure(error));
             // if it is due to missing peers or no internet connection, save the transaction
@@ -311,6 +319,30 @@ const setCurrentInOverlaySuccess = (transaction) => {
 export const setViewDetail = (value) => {
     return {
         type: SET_VIEW_DETAIL,
+        payload: value
+    }
+};
+
+/**
+ * Set Bike's Serial Number into state from the Register Form
+ * @param value
+ * @returns {{payload: *, type: string}}
+ */
+export const setSn = (value) => {
+    return {
+        type: SET_SN,
+        payload: value
+    }
+};
+
+/**
+ * Set Bike's Name into state from the Register Form
+ * @param value
+ * @returns {{payload: *, type: string}}
+ */
+export const setName = (value) => {
+    return {
+        type: SET_NAME,
         payload: value
     }
 };

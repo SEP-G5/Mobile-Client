@@ -15,7 +15,7 @@ class Cryptography {
             const keys = ec.keyFromSecret(randomBytes);
             resolve({
                 publicKey: keys.getPublic('hex'),
-                privateKey: keys.getSecret('hex')
+                privateKey:keys.getSecret('hex')
             });
 
         });
@@ -24,7 +24,7 @@ class Cryptography {
     static sign(privateKey, data) {
         return new Promise(async function (resolve) {
             const ec = new eddsa('ed25519');
-            const key = ec.keyFromSecret(privateKey);
+            const key = ec.keyFromSecret('hex');
             const hash = Cryptography.getDataHash(data);
             const signature = key.sign(hash).toHex();
             resolve(signature);
@@ -42,7 +42,7 @@ class Cryptography {
     }
 
     static getDataHash(data) {
-        return sha256(JSON.stringify(data)).toString(CryptoJS.enc.Hex);
+        return sha256(JSON.stringify(data)).toString(CryptoJS.enc.hex);
     }
 
 }
