@@ -28,7 +28,7 @@ const WelcomeStack = createStackNavigator(
 );
 
 WelcomeStack.navigationOptions = {
-    tabBarLabel: 'Home',
+    tabBarLabel: 'My Bikes',
     tabBarIcon: ({focused}) => (
         <TabBarIcon
             focused={focused}
