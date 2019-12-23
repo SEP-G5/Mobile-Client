@@ -2,6 +2,7 @@ import sha256 from 'crypto-js/sha256';
 import CryptoJS from 'crypto-js';
 import * as Random from 'expo-random';
 import { eddsa } from 'elliptic';
+import { encode, decode } from 'base64url';
 
 export const PUBLIC_KEY = 'PUBLIC_KEY';
 export const PRIVATE_KEY = 'PRIVATE_KEY';
@@ -14,8 +15,8 @@ class Cryptography {
             const ec = new eddsa('ed25519');
             const keys = ec.keyFromSecret(randomBytes);
             resolve({
-                publicKey: keys.getPublic('hex'),
-                privateKey: keys.getSecret('hex')
+                publicKey: encode(keys.getPublic()),
+                privateKey: encode(keys.getSecret())
             });
 
         });
@@ -24,9 +25,10 @@ class Cryptography {
     static sign(privateKey, data) {
         return new Promise(async function (resolve) {
             const ec = new eddsa('ed25519');
+            privateKey = decode(privateKey);
             const key = ec.keyFromSecret(privateKey);
             const hash = Cryptography.getDataHash(data);
-            const signature = key.sign(hash).toHex();
+            const signature = encode(key.sign(hash).toBytes());
             resolve(signature);
         });
     }
@@ -34,6 +36,8 @@ class Cryptography {
     static verify(publicKey, signature, data) {
         return new Promise(async function (resolve) {
             const ec = new eddsa('ed25519');
+            publicKey = decode(publicKey);
+            signature = decode(signature);
             const key = ec.keyFromPublic(publicKey, 'hex');
             const hash = Cryptography.getDataHash(data);
             const valid = key.verify(hash, signature);
