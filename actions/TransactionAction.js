@@ -132,10 +132,10 @@ export const saveTransaction = (transaction) => {
 const saveTransactionAsync = (transaction) => {
     return new Promise(async function (resolve) {
         let pendingTransactionsString = await Storage.get(STORAGE_TRANSACTIONS);
-        let pendingTransactions = [] 
+        let pendingTransactions = []
         try {
             pendingTransactions = JSON.parse(pendingTransactionsString)
-        } catch(e) {
+        } catch (e) {
             console.log(e);
         }
         if (!Array.isArray(pendingTransactions))
@@ -290,10 +290,10 @@ const saveTransactionSuccess = () => {
  * @param transaction
  */
 export const setCurrentInOverlay = (transaction) => {
-  return (dispatch)  => {
-      dispatch(setViewDetail(true));
-      dispatch(setCurrentInOverlaySuccess(transaction));
-  }
+    return (dispatch) => {
+        dispatch(setViewDetail(true));
+        dispatch(setCurrentInOverlaySuccess(transaction));
+    }
 };
 
 const setCurrentInOverlaySuccess = (transaction) => {
