@@ -21,6 +21,7 @@
     "expo-permissions": "^7.0.0",
     "expo-random": "~7.0.0",
     "immutable": "^4.0.0-rc.12",
+    "lodash": "^4.17.15",
     "react": "16.8.3",
     "react-dom": "16.8.3",
     "react-native": "https://github.com/expo/react-native/archive/sdk-35.0.0.tar.gz",
@@ -36,7 +37,8 @@
     "redux-immutable": "^4.0.0",
     "redux-thunk": "^1.0.0",
     "expo-background-fetch": "~7.0.0",
-    "expo-task-manager": "~7.0.0"
+    "expo-task-manager": "~7.0.0",
+    "expo-barcode-scanner": "~7.0.0"
   },
   "devDependencies": {
     "babel-preset-expo": "^7.1.0",

@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import { View, StyleSheet, Text, ScrollView} from 'react-native';
+import { View, StyleSheet, Text} from 'react-native';
 import { deleteKeyPair, getKeyPair, setViewKey } from '../actions/KeyPairAction';
 import {Button, Overlay} from 'react-native-elements';
 import QRCode from 'react-native-qrcode-svg';

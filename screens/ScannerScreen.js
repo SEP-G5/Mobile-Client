@@ -1,58 +1,63 @@
 import React,{Component} from 'react';
 import * as Permissions from 'expo-permissions';
-import { Camera } from 'expo-camera';
-import {View, TouchableOpacity, Text} from 'react-native';
+import {View, TouchableOpacity, Text, StyleSheet, Button} from 'react-native';
+import { BarCodeScanner } from 'expo-barcode-scanner';
 
-class ScannerScreen extends Component {
+export default class ScannerScreen extends Component {
+    state = {
+        hasCameraPermission: null,
+        scanned: false,
+    };
 
-  state = {
-    hasCameraPermission: null,
-    type: Camera.Constants.Type.back,
-  };
-
-  async componentDidMount () {
-    const {status} = await Permissions.askAsync(Permissions.CAMERA);
-    this.setState({hasCameraPermission: status === 'granted'});
-  }
-
-  render () {
-    const {hasCameraPermission} = this.state;
-    if (hasCameraPermission === null) {
-      return <View/>;
-    } else if (hasCameraPermission === false) {
-      return <Text>No access to camera</Text>;
-    } else {
-      return (
-        <View style={{flex: 1}}>
-          <Camera style={{flex: 1}} type={this.state.type}>
-            <View
-              style={{
-                flex: 1,
-                backgroundColor: 'transparent',
-                flexDirection: 'row',
-              }}>
-              <TouchableOpacity
-                style={{
-                  flex: 0.1,
-                  alignSelf: 'flex-end',
-                  alignItems: 'center',
-                }}
-                onPress={() => {
-                  this.setState({
-                    type:
-                      this.state.type === Camera.Constants.Type.back
-                        ? Camera.Constants.Type.front
-                        : Camera.Constants.Type.back,
-                  });
-                }}>
-                <Text style={{fontSize: 18, marginBottom: 10, color: 'white'}}> Flip </Text>
-              </TouchableOpacity>
-            </View>
-          </Camera>
-        </View>
-      );
+    async componentDidMount() {
+        this.getPermissionsAsync();
     }
-  }
-}
 
-export default ScannerScreen;
+    getPermissionsAsync = async () => {
+        const { status } = await Permissions.askAsync(Permissions.CAMERA);
+        this.setState({ hasCameraPermission: status === 'granted' });
+    };
+
+    render() {
+        const { hasCameraPermission, scanned } = this.state;
+
+        if (hasCameraPermission === null) {
+            return <Text>Requesting for camera permission</Text>;
+        }
+        if (hasCameraPermission === false) {
+            return <Text>No access to camera</Text>;
+        }
+        return (
+            <View
+                style={{
+                    flex: 1,
+                    flexDirection: 'column',
+                    justifyContent: 'flex-end',
+                }}>
+                <BarCodeScanner
+                    onBarCodeScanned={scanned ? undefined : this.handleBarCodeScanned}
+                    style={StyleSheet.absoluteFillObject}
+                />
+
+                {scanned && (
+                    <Button title={'Tap to Scan Again'} onPress={() => this.setState({ scanned: false })} />
+                )}
+            </View>
+        );
+    }
+
+    handleBarCodeScanned = ({ type, data }) => {
+        this.setState({ scanned: true });
+        const {navigation} = this.props;
+        if (type === 'org.iso.QRCode'){
+            const item = navigation.getParam('item');
+            const nextScreen = navigation.getParam('next');
+            //send data to next screen.
+            if (item){
+                navigation.navigate(nextScreen, {item, data});
+            } else {
+                navigation.navigate(nextScreen, {data});
+            }
+        }
+    };
+}

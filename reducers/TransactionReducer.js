@@ -11,7 +11,7 @@ import {
     SEND_TRANSACTION_SUCCESS,
     GET_TRANSACTIONS_REQUEST,
     GET_TRANSACTIONS_FAILURE,
-    GET_TRANSACTIONS_SUCCESS,
+    GET_TRANSACTIONS_SUCCESS, SET_CURRENT_IN_OVERLAY, SET_VIEW_DETAIL,
 } from '../actions/TransactionAction'
 
 const initialState = Immutable.fromJS({
@@ -25,7 +25,9 @@ const initialState = Immutable.fromJS({
     transactions: [],
     valid: false,
     loading: false,
-    error: undefined
+    error: undefined,
+    current: undefined,
+    viewDetail: false
 });
 
 export default (state = initialState, action) => {
@@ -58,6 +60,10 @@ export default (state = initialState, action) => {
             return state
                 .set('transactions', action.payload)
                 .set('loading', false);
+        case SET_CURRENT_IN_OVERLAY:
+            return state.set('current', action.payload);
+        case SET_VIEW_DETAIL:
+            return state.set('viewDetail', action.payload);
         default:
             return state;
     }
