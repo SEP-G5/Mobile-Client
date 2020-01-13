@@ -1,6 +1,7 @@
 import { Cryptography } from '../services/CryptographyService';
 import { Peer } from '../services/PeerService';
 import { Storage } from '../services/StorageService';
+import { transactionToBuffer } from '../utils/transactionBuffer';
 
 export const STORAGE_TRANSACTIONS = 'transactions';
 
@@ -58,8 +59,8 @@ const createTransactionAsync = (id, publicKeyInput, publicKeyOutput, privateKey)
             publicKeyOutput: publicKeyOutput,
             timestamp: Math.round(date.getTime() / 1000)
         };
-
-        Cryptography.sign(privateKey, transaction).then(function (signature) {
+        var transactionBuffer = transactionToBuffer(transaction);
+        Cryptography.sign(privateKey, transactionBuffer).then(function (signature) {
             resolve({
                 ...transaction,
                 signature: signature
@@ -81,8 +82,9 @@ const verifyTransactionAsync = (transaction) => {
 
         var signature = transactionClone.signature;
         delete transactionClone.signature;
+        var transactionBuffer = transactionToBuffer(transactionClone);
 
-        Cryptography.verify(key, signature, transactionClone).then(function (valid) {
+        Cryptography.verify(key, signature, transactionBuffer).then(function (valid) {
 
             resolve({
                 valid: valid
@@ -132,10 +134,10 @@ export const saveTransaction = (transaction) => {
 const saveTransactionAsync = (transaction) => {
     return new Promise(async function (resolve) {
         let pendingTransactionsString = await Storage.get(STORAGE_TRANSACTIONS);
-        let pendingTransactions = [] 
+        let pendingTransactions = []
         try {
             pendingTransactions = JSON.parse(pendingTransactionsString)
-        } catch(e) {
+        } catch (e) {
             console.log(e);
         }
         if (!Array.isArray(pendingTransactions))
@@ -290,10 +292,10 @@ const saveTransactionSuccess = () => {
  * @param transaction
  */
 export const setCurrentInOverlay = (transaction) => {
-  return (dispatch)  => {
-      dispatch(setViewDetail(true));
-      dispatch(setCurrentInOverlaySuccess(transaction));
-  }
+    return (dispatch) => {
+        dispatch(setViewDetail(true));
+        dispatch(setCurrentInOverlaySuccess(transaction));
+    }
 };
 
 const setCurrentInOverlaySuccess = (transaction) => {

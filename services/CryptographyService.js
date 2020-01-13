@@ -18,35 +18,34 @@ class Cryptography {
                 publicKey: encode(keys.getPublic()),
                 privateKey: encode(keys.getSecret())
             });
-
         });
     }
 
-    static sign(privateKey, data) {
+    static sign(privateKey, dataBuffer) {
         return new Promise(async function (resolve) {
             const ec = new eddsa('ed25519');
             privateKey = toBuffer(privateKey);
             const key = ec.keyFromSecret(privateKey);
-            const hash = Cryptography.getDataHash(data);
-            const signature = encode(key.sign(hash).toBytes());
+            // var hash = Cryptography.getDataHash(String.fromCharCode.apply(null, dataBuffer));
+            const signature = encode(key.sign(dataBuffer).toBytes());
             resolve(signature);
         });
     }
 
-    static verify(publicKey, signature, data) {
+    static verify(publicKey, signature, dataBuffer) {
         return new Promise(async function (resolve) {
             const ec = new eddsa('ed25519');
             publicKey = Array.from(toBuffer(publicKey));
             signature = Array.from(toBuffer(signature));
             const key = ec.keyFromPublic(publicKey);
-            const hash = Cryptography.getDataHash(data);
-            const valid = key.verify(hash, signature);
+            // var hash = Cryptography.getDataHash(String.fromCharCode.apply(null, dataBuffer));
+            const valid = key.verify(dataBuffer, signature);
             resolve(valid);
         });
     }
 
-    static getDataHash(data) {
-        return sha256(JSON.stringify(data)).toString();
+    static getDataHash(dataBuffer) {
+        return sha256(dataBuffer).toString();
     }
 
 }
