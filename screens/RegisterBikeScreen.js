@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {View, Text, StyleSheet} from 'react-native';
 import {Button, Input} from 'react-native-elements';
-import {setSn, setName, createTransaction, sendTransaction} from '../actions/TransactionAction';
+import {setSn, setName, createTransaction, sendTransaction, verifyTransaction} from '../actions/TransactionAction';
 
 class RegisterBikeScreen extends Component {
     static navigationOptions = ({navigation}) => {
@@ -16,12 +16,16 @@ class RegisterBikeScreen extends Component {
         const {transaction: oldTransaction} = this.props;
         if (transaction.timestamp !== oldTransaction.timestamp){
             //If there is a new transaction to send... send it.
+            console.log("Transaction", transaction);
+            this.props.verifyTransaction(transaction);
             this.props.sendTransaction(transaction);
         }
     }
 
     handleOnPress = () => {
         const {publicKey, privateKey, sn} = this.props;
+        console.log("PublicKey", publicKey);
+        console.log("PrivateKey", privateKey);
         this.props.createTransaction(sn, null, publicKey, privateKey);
     };
 
@@ -77,4 +81,4 @@ const styles = StyleSheet.create({
     container: {flex: 1, justifyContent: 'center', paddingBottom: 10, paddingTop: 10, paddingLeft: 5, paddingRight: 5}
 });
 
-export default connect(mapStateToProps, {setSn, setName, createTransaction, sendTransaction})(RegisterBikeScreen);
+export default connect(mapStateToProps, {setSn, setName, createTransaction, sendTransaction, verifyTransaction})(RegisterBikeScreen);

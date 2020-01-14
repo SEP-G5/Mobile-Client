@@ -6,6 +6,8 @@ import { Task } from '../services/TaskService';
 export const SEND_PENDING_TRANSACTIONS_INTERVAL = 60 * 60;
 export const SEND_PENDING_TRANSACTIONS_TASK = 'send_pending_transactions_task';
 
+import { transactionToBuffer } from '../utils/transactionBuffer';
+
 export const STORAGE_TRANSACTIONS = 'transactions';
 
 export const SEND_TRANSACTION_URL = '/transaction';
@@ -64,8 +66,8 @@ const createTransactionAsync = (id, publicKeyInput, publicKeyOutput, privateKey)
             publicKeyOutput: publicKeyOutput,
             timestamp: Math.round(date.getTime() / 1000)
         };
-
-        Cryptography.sign(privateKey, transaction).then(function (signature) {
+        var transactionBuffer = transactionToBuffer(transaction);
+        Cryptography.sign(privateKey, transactionBuffer).then(function (signature) {
             resolve({
                 ...transaction,
                 signature: signature
@@ -87,8 +89,9 @@ const verifyTransactionAsync = (transaction) => {
 
         var signature = transactionClone.signature;
         delete transactionClone.signature;
+        var transactionBuffer = transactionToBuffer(transactionClone);
 
-        Cryptography.verify(key, signature, transactionClone).then(function (valid) {
+        Cryptography.verify(key, signature, transactionBuffer).then(function (valid) {
 
             resolve({
                 valid: valid
