@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import {getKeyPair} from "../actions/KeyPairAction";
 import {getOwnedBikes, refreshOwnedBikes} from "../actions/BikeAction";
 import TopBarIcon from '../components/TopBarIcon';
-import { Platform, TouchableOpacity, View, FlatList, Text, SafeAreaView, StyleSheet, ScrollView} from 'react-native';
+import { Platform, TouchableOpacity, View, FlatList, Text, SafeAreaView, StyleSheet, ScrollView, RefreshControl} from 'react-native';
 import {ListItem, Button} from 'react-native-elements';
 import _ from 'lodash';
 
@@ -49,13 +49,13 @@ class HomeScreen extends Component {
     );
   };
 
+  _onRefresh = () => {
+      const {publicKey} = this.props;
+      this.props.refreshOwnedBikes(publicKey);
+  };
+
   render(){
-    const {loading, bikes, loadingBikes} = this.props;
-    if (loading) {
-        return <View style={styles.container}>
-            <Text style={{fontSize:24, textAlign:'center'}}>Loading...</Text>
-        </View>
-    }
+    const {bikes, loadingBikes} = this.props;
 
     if (loadingBikes) {
         return <View style={styles.container}>
@@ -76,7 +76,9 @@ class HomeScreen extends Component {
 
     return (
       <View style={{flex:1}}>
-        <ScrollView>
+        <ScrollView
+            refreshControl={<RefreshControl refreshing={loadingBikes} onRefresh={() => this._onRefresh()} />}
+        >
           <SafeAreaView style={styles.container}>
             <FlatList
               data={bikes}
@@ -92,7 +94,6 @@ class HomeScreen extends Component {
 }
 
 const mapStateToProps = (state) => ({
-    loading: state.get('keyPair').get('loading'),
     publicKey: state.get('keyPair').get('publicKey'),
     bikes: state.get('bike').get('bikes'),
     loadingBikes: state.get('bike').get('loading')
