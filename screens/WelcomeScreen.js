@@ -45,13 +45,13 @@ class HomeScreen extends Component {
     const {loading, bikes} = this.props;
 
     if (loading) {
-        return <View style={{flex:1, justifyContent:'center'}}>
+        return <View style={styles.container}>
             <Text style={{fontSize:24, textAlign:'center'}}>Loading...</Text>
         </View>
     }
 
     if (typeof bikes === undefined || bikes.length === undefined) {
-        return <View style={{flex:1}}>
+        return <View style={styles.container}>
             <Text style={{fontSize:24, marginTop:15, textAlign:'center'}}>You don't own any bikes...</Text>
             <Button
                 title="Register a bike!"
@@ -87,7 +87,7 @@ const mapStateToProps = (state) => ({
 export default connect(mapStateToProps, {getKeyPair, refreshOwnedBikes})(HomeScreen);
 
 const styles = StyleSheet.create({
-  container: {flex:1},
-  item: {flex:1,paddingTop:20, paddingBottom:20,backgroundColor:'#eee',marginBottom:2},
-  itemTxt: {paddingLeft:5, color:'#000', fontSize: 18}
+    container: {flex: 1, justifyContent: 'center', paddingBottom: 10, paddingTop: 10, paddingLeft: 5, paddingRight: 5},
+    item: {flex:1,paddingTop:20, paddingBottom:20,backgroundColor:'#eee',marginBottom:2},
+    itemTxt: {paddingLeft:5, color:'#000', fontSize: 18}
 });
