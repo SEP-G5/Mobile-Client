@@ -58,7 +58,6 @@ class RegisterBikeScreen extends Component {
         }
 
         if (error !== undefined){
-            console.log(error);
             errorMessage = error.error.data.msg;
         }
 
