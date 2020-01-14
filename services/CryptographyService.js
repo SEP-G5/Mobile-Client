@@ -12,7 +12,6 @@ class Cryptography {
     static generateKeyPair() {
         return new Promise(async function (resolve) {
             const randomBytes = await Random.getRandomBytesAsync(32);
-            console.log("Random", randomBytes);
             const ec = new eddsa('ed25519');
             const keys = ec.keyFromSecret(randomBytes);
             resolve({
@@ -27,10 +26,8 @@ class Cryptography {
             const ec = new eddsa('ed25519');
             privateKey = toBuffer(privateKey);
             const key = ec.keyFromSecret(privateKey);
-            //console.log("Buffer", dataBuffer);
-            //console.log("String", String.fromCharCode.apply(null, dataBuffer));
             //const hash = Cryptography.getDataHash(String.fromCharCode.apply(null, dataBuffer));
-            //console.log("Hash", hash);
+            //We sign without hashing the buffer.
             const signature = encode(key.sign(dataBuffer).toBytes());
             resolve(signature);
         });

@@ -16,16 +16,12 @@ class RegisterBikeScreen extends Component {
         const {transaction: oldTransaction} = this.props;
         if (transaction.timestamp !== oldTransaction.timestamp){
             //If there is a new transaction to send... send it.
-            console.log("Transaction", transaction);
-            this.props.verifyTransaction(transaction);
             this.props.sendTransaction(transaction);
         }
     }
 
     handleOnPress = () => {
         const {publicKey, privateKey, sn} = this.props;
-        console.log("PublicKey", publicKey);
-        console.log("PrivateKey", privateKey);
         this.props.createTransaction(sn, null, publicKey, privateKey);
     };
 
