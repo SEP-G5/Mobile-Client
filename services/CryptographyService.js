@@ -15,10 +15,6 @@ class Cryptography {
             console.log("Random", randomBytes);
             const ec = new eddsa('ed25519');
             const keys = ec.keyFromSecret(randomBytes);
-            const key = {
-                publicKey: encode(keys.getPublic()),
-                privateKey: encode(keys.getSecret())
-            };
             resolve({
                 publicKey: encode(keys.getPublic()),
                 privateKey: encode(keys.getSecret())
