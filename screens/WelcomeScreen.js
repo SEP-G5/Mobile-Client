@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {getKeyPair} from "../actions/KeyPairAction";
-import {refreshOwnedBikes} from "../actions/BikeAction";
+import {getOwnedBikes, refreshOwnedBikes} from "../actions/BikeAction";
 import TopBarIcon from '../components/TopBarIcon';
 import { Platform, TouchableOpacity, View, FlatList, Text, SafeAreaView, StyleSheet, ScrollView} from 'react-native';
 import {ListItem, Button} from 'react-native-elements';
@@ -19,7 +19,16 @@ class HomeScreen extends Component {
 
   componentDidMount() {
       this.props.getKeyPair();
-      this.props.refreshOwnedBikes();
+  }
+
+  componentWillReceiveProps(nextProps, nextContext) {
+      const {publicKey: newPublicKey} = nextProps;
+      const {publicKey: oldPublicKey} = this.props;
+
+      if (newPublicKey !== oldPublicKey){
+          this.props.refreshOwnedBikes(newPublicKey);
+          this.props.getOwnedBikes();
+      }
   }
 
   onPressItem = (item) => {
@@ -30,9 +39,8 @@ class HomeScreen extends Component {
     return (
         <TouchableOpacity>
             <ListItem
-                title={_.truncate(item.name,{length: 30})}
-                subtitle={`# ${item.id}`}
-                subtitleStyle={{color:'#aaa', fontStyle:'italic'}}
+                title={`#${_.truncate(item,{length: 30})}`}
+                titleStyle={{color:'#aaa', fontStyle:'italic'}}
                 bottomDivider
                 chevron
                 onPress={() => this.onPressItem(item)}
@@ -42,15 +50,20 @@ class HomeScreen extends Component {
   };
 
   render(){
-    const {loading, bikes} = this.props;
-
+    const {loading, bikes, loadingBikes} = this.props;
     if (loading) {
         return <View style={styles.container}>
             <Text style={{fontSize:24, textAlign:'center'}}>Loading...</Text>
         </View>
     }
 
-    if (typeof bikes === undefined || bikes.length === undefined) {
+    if (loadingBikes) {
+        return <View style={styles.container}>
+            <Text style={{fontSize:24, textAlign:'center'}}>Loading Your Bikes...</Text>
+        </View>
+    }
+
+    if (!bikes) {
         return <View style={styles.container}>
             <Text style={{fontSize:24, marginTop:15, textAlign:'center'}}>You don't own any bikes...</Text>
             <Button
@@ -68,7 +81,7 @@ class HomeScreen extends Component {
             <FlatList
               data={bikes}
               renderItem={({item}) => this.renderItem(item)}
-              keyExtractor={item => item.id}
+              keyExtractor={item => item}
             />
           </SafeAreaView>
         </ScrollView>
@@ -80,11 +93,12 @@ class HomeScreen extends Component {
 
 const mapStateToProps = (state) => ({
     loading: state.get('keyPair').get('loading'),
+    publicKey: state.get('keyPair').get('publicKey'),
     bikes: state.get('bike').get('bikes'),
-    loadingBikes: state.get('bike').get('loading'),
+    loadingBikes: state.get('bike').get('loading')
 });
 
-export default connect(mapStateToProps, {getKeyPair, refreshOwnedBikes})(HomeScreen);
+export default connect(mapStateToProps, {getKeyPair, refreshOwnedBikes, getOwnedBikes})(HomeScreen);
 
 const styles = StyleSheet.create({
     container: {flex: 1, justifyContent: 'center', paddingBottom: 10, paddingTop: 10, paddingLeft: 5, paddingRight: 5},
