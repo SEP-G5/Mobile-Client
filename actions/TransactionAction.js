@@ -32,6 +32,7 @@ export const SET_CURRENT_IN_OVERLAY = 'set_current_in_overlay';
 export const SET_VIEW_DETAIL = 'set_view_detail';
 export const SET_SN = 'set_sn';
 export const SET_NAME = 'set_name';
+export const RESET_REGISTER_BIKE_STATE = 'reset_register_bike_state';
 
 export const createTransaction = (id, publicKeyInput, publicKeyOutput, privateKey) => {
     return (dispatch) => {
@@ -119,9 +120,10 @@ export const sendTransaction = (transaction) => {
                 dispatch(sendTransactionFailure(response));
             }
         }).catch(function (error) {
-            dispatch(sendTransactionFailure(error));
+
             // if it is due to missing peers or no internet connection, save the transaction
             if (error.response) {
+                dispatch(sendTransactionFailure(error.response));
                 console.log(error.response.data);
                 console.log(error.response.status);
                 console.log(error.response.headers);
@@ -378,5 +380,15 @@ export const setName = (value) => {
     return {
         type: SET_NAME,
         payload: value
+    }
+};
+
+/**
+ * Reset the state that handles bike registration.
+ * @returns {{type: string}}
+ */
+export const resetRegisterBikeState = () => {
+    return {
+        type: RESET_REGISTER_BIKE_STATE
     }
 };
