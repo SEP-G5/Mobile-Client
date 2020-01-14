@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {getKeyPair} from "../actions/KeyPairAction";
+import {refreshOwnedBikes} from "../actions/BikeAction";
 import TopBarIcon from '../components/TopBarIcon';
 import { Platform, TouchableOpacity, View, FlatList, Text, SafeAreaView, StyleSheet, ScrollView} from 'react-native';
 import {ListItem, Button} from 'react-native-elements';
@@ -18,6 +19,7 @@ class HomeScreen extends Component {
 
   componentDidMount() {
       this.props.getKeyPair();
+      this.props.refreshOwnedBikes();
   }
 
   onPressItem = (item) => {
@@ -40,11 +42,22 @@ class HomeScreen extends Component {
   };
 
   render(){
-    const {loading} = this.props;
+    const {loading, bikes} = this.props;
 
     if (loading) {
-        return <View style={{flex:1, justifyContent:'center'}}>
+        return <View style={styles.container}>
             <Text style={{fontSize:24, textAlign:'center'}}>Loading...</Text>
+        </View>
+    }
+
+    if (typeof bikes === undefined || bikes.length === undefined) {
+        return <View style={styles.container}>
+            <Text style={{fontSize:24, marginTop:15, textAlign:'center'}}>You don't own any bikes...</Text>
+            <Button
+                title="Register a bike!"
+                onPress={ () => this.props.navigation.navigate('RegisterBike')}
+                style={{marginTop:30, paddingLeft:20,paddingRight:20}}
+            />
         </View>
     }
 
@@ -53,17 +66,12 @@ class HomeScreen extends Component {
         <ScrollView>
           <SafeAreaView style={styles.container}>
             <FlatList
-              data={MY_BIKES}
+              data={bikes}
               renderItem={({item}) => this.renderItem(item)}
               keyExtractor={item => item.id}
             />
           </SafeAreaView>
         </ScrollView>
-        <Button
-            title="Receive Ownership"
-            onPress={ () => alert("Receive Bike")}
-            style={{marginBottom:15, paddingLeft:5,paddingRight:5}}
-        />
       </View>
     );
   }
@@ -71,19 +79,15 @@ class HomeScreen extends Component {
 }
 
 const mapStateToProps = (state) => ({
-   loading: state.get('keyPair').get('loading')
+    loading: state.get('keyPair').get('loading'),
+    bikes: state.get('bike').get('bikes'),
+    loadingBikes: state.get('bike').get('loading'),
 });
 
-export default connect(mapStateToProps, {getKeyPair})(HomeScreen);
-
-const MY_BIKES = [
-    {id: "JH4K3H5JDFJHDFJ34", name: "CITYCYKEL LÅGT INSTEG ELOPS 520 RÖD"},
-    {id: "JHASDJKHFSAJH434L", name: "MTB ROCKRIDER 100 24'' 9-12 ÅR"},
-    {id: "JKLSDHFADFHJ34343", name: "MTB ST 50 26'' SVART"}
-  ];
+export default connect(mapStateToProps, {getKeyPair, refreshOwnedBikes})(HomeScreen);
 
 const styles = StyleSheet.create({
-  container: {flex:1},
-  item: {flex:1,paddingTop:20, paddingBottom:20,backgroundColor:'#eee',marginBottom:2},
-  itemTxt: {paddingLeft:5, color:'#000', fontSize: 18}
+    container: {flex: 1, justifyContent: 'center', paddingBottom: 10, paddingTop: 10, paddingLeft: 5, paddingRight: 5},
+    item: {flex:1,paddingTop:20, paddingBottom:20,backgroundColor:'#eee',marginBottom:2},
+    itemTxt: {paddingLeft:5, color:'#000', fontSize: 18}
 });

@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export const FETCH_PEER_URL = '/peer';
 const DEFAULT_PEERS = [
-    "192.168.1.248:8000"
+    "192.168.0.145:8000"
 ]
 
 class Peer {

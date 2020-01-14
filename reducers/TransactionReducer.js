@@ -15,7 +15,7 @@ import {
     SET_CURRENT_IN_OVERLAY,
     SET_VIEW_DETAIL,
     SET_SN,
-    SET_NAME
+    SET_NAME, RESET_REGISTER_BIKE_STATE
 } from '../actions/TransactionAction'
 
 const initialState = Immutable.fromJS({
@@ -29,7 +29,7 @@ const initialState = Immutable.fromJS({
     transactions: [],
     valid: false,
     loading: false,
-    success: false,
+    success: undefined,
     error: undefined,
     current: undefined,
     viewDetail: false,
@@ -77,6 +77,11 @@ export default (state = initialState, action) => {
             return state.setIn(['registerForm', 'sn'], action.payload);
         case SET_NAME:
             return state.setIn(['registerForm', 'name'], action.payload);
+        case RESET_REGISTER_BIKE_STATE:
+            return state.setIn(['registerForm', 'sn'], '')
+                        .setIn(['registerForm', 'name'], '')
+                        .set('success', undefined)
+                        .set('error', undefined);
         default:
             return state;
     }
