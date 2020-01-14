@@ -26,18 +26,15 @@ class Cryptography {
         });
     }
 
-    /**
-     *
-     * @param privateKey String
-     * @param dataBuffer
-     * @returns {Promise<unknown>}
-     */
     static sign(privateKey, dataBuffer) {
         return new Promise(async function (resolve) {
             const ec = new eddsa('ed25519');
             privateKey = toBuffer(privateKey);
             const key = ec.keyFromSecret(privateKey);
-            // var hash = Cryptography.getDataHash(String.fromCharCode.apply(null, dataBuffer));
+            //console.log("Buffer", dataBuffer);
+            //console.log("String", String.fromCharCode.apply(null, dataBuffer));
+            //const hash = Cryptography.getDataHash(String.fromCharCode.apply(null, dataBuffer));
+            //console.log("Hash", hash);
             const signature = encode(key.sign(dataBuffer).toBytes());
             resolve(signature);
         });
@@ -49,8 +46,7 @@ class Cryptography {
             publicKey = Array.from(toBuffer(publicKey));
             signature = Array.from(toBuffer(signature));
             const key = ec.keyFromPublic(publicKey);
-            const hash = Cryptography.getDataHash(String.fromCharCode.apply(null, dataBuffer));
-            console.log("Hash", hash);
+            //const hash = Cryptography.getDataHash(String.fromCharCode.apply(null, dataBuffer));
             const valid = key.verify(dataBuffer, signature);
             resolve(valid);
         });
