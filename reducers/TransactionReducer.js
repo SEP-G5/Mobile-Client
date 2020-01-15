@@ -33,7 +33,7 @@ const initialState = Immutable.fromJS({
     error: undefined,
     current: undefined,
     viewDetail: false,
-    registerForm:{
+    registerForm: {
         sn: '',
         name: ''
     }
@@ -42,6 +42,8 @@ const initialState = Immutable.fromJS({
 export default (state = initialState, action) => {
     switch (action.type) {
         case GET_TRANSACTIONS_REQUEST:
+            return state
+                .set('loading', true).set('success', false).set('transactions', [])
         case SEND_TRANSACTION_REQUEST:
         case VERIFY_TRANSACTION_REQUEST:
         case CREATE_TRANSACTION_REQUEST:
@@ -66,8 +68,12 @@ export default (state = initialState, action) => {
             return state
                 .set('loading', false).set('success', true);
         case GET_TRANSACTIONS_SUCCESS:
+            var transactions = action.payload.data;
+            if (state.get('transactions').length !== undefined)
+                transactions = state.get('transactions').concat(action.payload.data);
+            transactions.sort((a,b) => (a.timestamp > b.timestamp) ? 1 : ((b.timestamp > a.timestamp) ? -1 : 0)); 
             return state
-                .set('transactions', action.payload)
+                .set('transactions', transactions)
                 .set('loading', false);
         case SET_CURRENT_IN_OVERLAY:
             return state.set('current', action.payload);

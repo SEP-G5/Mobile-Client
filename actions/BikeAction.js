@@ -57,39 +57,30 @@ const refreshOwnedBikesAsync = (publicKey) => {
         let rejectedBikes = [];
         let ownedBikes = [];
         let currentTransactions = [];
-        let skip = 0;
-        const limit = 10;
-        let done = false;
 
-        do {
-            const request = {
-                method: 'get',
-                params: {
-                    limit: limit,
-                    skip: skip,
-                    publicKey: publicKey
-                }
-            };
-            try {
-                const response = await Peer.sendRequest(SEND_TRANSACTION_URL, request);
-                currentTransactions = response.data;
-                currentTransactions = currentTransactions.reverse();
-                currentTransactions.forEach(function (transaction) {
-                    if (rejectedBikes.includes(transaction.id) || ownedBikes.includes(transaction.id)) {
-                        return;
-                    }
-                    if (transaction.publicKeyOutput.slice(0, -1) === publicKey) {
-                        ownedBikes.push(transaction.id);
-                    } else if (transaction.publicKeyInput.slice(0, -1) === publicKey) {
-                        rejectedBikes.push(transaction.id);
-                    }
-                });
-                skip += limit;
-            } catch (e) {
-                console.log(e);
+        const request = {
+            method: 'get',
+            params: {
+                publicKey: publicKey
             }
-            done = true;
-        } while (!done);
+        };
+        try {
+            const response = await Peer.sendRequest(SEND_TRANSACTION_URL, request);
+            currentTransactions = response.data;
+            currentTransactions = currentTransactions.reverse();
+            currentTransactions.forEach(function (transaction) {
+                if (rejectedBikes.includes(transaction.id) || ownedBikes.includes(transaction.id)) {
+                    return;
+                }
+                if (transaction.publicKeyOutput.slice(0, -1) === publicKey) {
+                    ownedBikes.push(transaction.id);
+                } else if (transaction.publicKeyInput.slice(0, -1) === publicKey) {
+                    rejectedBikes.push(transaction.id);
+                }
+            });
+        } catch (e) {
+            console.log(e);
+        }
         Storage.set(STORAGE_BIKES, JSON.stringify(ownedBikes)).then(function () {
             resolve();
         }).catch(function (error) {
