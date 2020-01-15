@@ -200,17 +200,15 @@ export const getTransactions = (limit = 0, skip = 0, publicKey = undefined, id =
         dispatch(getTransactionsRequest());
         const request = {
             method: 'get',
-            query: {
-                limit: limit,
-                skip: skip,
-                publicKey: publicKey,
+            params: {
                 id: id,
+                publicKey: publicKey
             }
         };
-        Peer.sendRequest(SEND_TRANSACTION_URL, request).then(function (response) {
-            dispatch(getTransactionsSuccess());
+        Peer.sendRequest(GET_TRANSACTIONS_URL, request).then(function (response) {
+            dispatch(getTransactionsSuccess(response));
         }).catch(function (error) {
-            dispatch(getTransactionsFailure());
+            dispatch(getTransactionsFailure(error));
         });
     }
 }
