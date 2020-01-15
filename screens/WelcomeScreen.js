@@ -32,7 +32,7 @@ class HomeScreen extends Component {
   }
 
   onPressItem = (item) => {
-      this.props.navigation.navigate('Detail', {item});
+      this.props.navigation.navigate('Detail', {id:item});
   };
 
   renderItem = (item) => {
@@ -63,14 +63,18 @@ class HomeScreen extends Component {
         </View>
     }
 
-    if (!bikes) {
+    if (!bikes || bikes.length === 0) {
         return <View style={styles.container}>
-            <Text style={{fontSize:24, marginTop:15, textAlign:'center'}}>You don't own any bikes...</Text>
-            <Button
-                title="Register a bike!"
-                onPress={ () => this.props.navigation.navigate('RegisterBike')}
-                style={{marginTop:30, paddingLeft:20,paddingRight:20}}
-            />
+            <ScrollView
+                refreshControl={<RefreshControl refreshing={loadingBikes} onRefresh={() => this._onRefresh()}/>}
+            >
+                <Text style={{fontSize:24, marginTop:15, textAlign:'center'}}>You don't own any bikes...</Text>
+                <Button
+                    title="Register a bike!"
+                    onPress={ () => this.props.navigation.navigate('RegisterBike')}
+                    style={{marginTop:30, paddingLeft:20,paddingRight:20}}
+                />
+            </ScrollView>
         </View>
     }
 
