@@ -52,11 +52,6 @@ class DetailScreen extends Component {
                             />
                         </SafeAreaView>
                     </ScrollView>
-                    {transactions.length > 9 &&
-                    <Button
-                        title="Load More"
-                        onPress={() => this.props.navigation.navigate('Scanner',{item: id, next:'SendTransaction'})}
-                    />}
                 </View>
                 <Button
                     title="Transfer Ownership"
