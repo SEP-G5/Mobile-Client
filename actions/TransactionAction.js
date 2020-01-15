@@ -62,14 +62,14 @@ export const verifyTransaction = (transaction) => {
 
 const createTransactionAsync = (id, publicKeyInput, publicKeyOutput, privateKey) => {
     return new Promise(async function (resolve) {
-        var date = new Date();
-        var transaction = {
+        let date = new Date();
+        let transaction = {
             id: id,
             publicKeyInput: publicKeyInput,
             publicKeyOutput: publicKeyOutput,
             timestamp: Math.round(date.getTime() / 1000)
         };
-        var transactionBuffer = transactionToBuffer(transaction);
+        let transactionBuffer = transactionToBuffer(transaction);
         Cryptography.sign(privateKey, transactionBuffer).then(function (signature) {
             resolve({
                 ...transaction,

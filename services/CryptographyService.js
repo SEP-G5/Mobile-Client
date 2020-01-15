@@ -26,6 +26,8 @@ class Cryptography {
             const ec = new eddsa('ed25519');
             privateKey = toBuffer(privateKey);
             const key = ec.keyFromSecret(privateKey);
+            //console.log("Buffer", JSON.stringify(dataBuffer));
+            //console.log("Length", dataBuffer.length);
             //const hash = Cryptography.getDataHash(String.fromCharCode.apply(null, dataBuffer));
             //We sign without hashing the buffer.
             const signature = encode(key.sign(dataBuffer).toBytes());
