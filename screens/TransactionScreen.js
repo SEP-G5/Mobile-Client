@@ -7,12 +7,6 @@ import { ListItem, Input } from 'react-native-elements';
 import { getTransactions } from '../actions/TransactionAction';
 
 class TransactionScreen extends Component {
-
-  search(text) {
-    this.props.getTransactions(0, 0, text, undefined);
-    this.props.getTransactions(0, 0, undefined, text);
-  }
-
   static navigationOptions = ({ navigation }) => {
     return {
       title: 'Transactions',
@@ -20,19 +14,25 @@ class TransactionScreen extends Component {
     }
   };
 
+  componentDidMount() {
+    const {publicKey} = this.props;
+    const limit = 10, skip = 0;
+    this.props.getTransactions(limit, skip, publicKey);
+  }
+
+  search(text) {
+    this.props.getTransactions(0, 0, text, undefined);
+    this.props.getTransactions(0, 0, undefined, text);
+  }
+
   renderItem = (item) => {
+    let transactionType = item.publicKeyInput ? "(Transfer) to" + item.publicKeyOutput + "->" : '(Registration)';
     return (
       <ListItem
-        title={item.id}
-        subtitle={
-          <View>
-            <Text>{item.publicKeyInput ? "(Transfer)" + item.publicKeyInput + "->" : '(Registration)'} {item.publicKeyOutput}</Text>
-            <Text>{new Date(item.timestamp * 1000).toLocaleString()}</Text>
-          </View>
-        }
+        title={`#${item.id} - ${transactionType} `}
+        subtitle={new Date(item.timestamp * 1000).toLocaleString()}
         subtitleStyle={{ color: '#aaa', fontStyle: 'italic' }}
         bottomDivider
-        chevron
       />
     );
   };
@@ -40,7 +40,7 @@ class TransactionScreen extends Component {
   render() {
     const { transactions } = this.props;
     const transactionsList = transactions.length === undefined ? [] : transactions;
-    // console.log(transactionsList);
+    console.log(transactionsList);
     return (
 
       <View style={{ flex: 1 }}>
@@ -66,7 +66,8 @@ const mapStateToProps = (state) => ({
   transactions: state.get('transaction').get('transactions'),
   loading: state.get('transaction').get('loading'),
   success: state.get('transaction').get('success'),
-  error: state.get('transaction').get('error')
+  error: state.get('transaction').get('error'),
+  publicKey: state.get('keyPair').get('publicKey')
 });
 
 const styles = StyleSheet.create({
