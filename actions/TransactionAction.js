@@ -33,6 +33,8 @@ export const SET_VIEW_DETAIL = 'set_view_detail';
 export const SET_SN = 'set_sn';
 export const SET_NAME = 'set_name';
 export const RESET_REGISTER_BIKE_STATE = 'reset_register_bike_state';
+export const RESET_TRANSFER_OWNERSHIP_STATE = 'reset_transfer_ownership_state';
+
 
 export const createTransaction = (id, publicKeyInput, publicKeyOutput, privateKey) => {
     return (dispatch) => {
@@ -111,6 +113,8 @@ export const sendTransaction = (transaction) => {
                 'Content-Type': 'application/json'
             },
         };
+
+        console.log(transaction);
 
         Peer.sendRequest(SEND_TRANSACTION_URL, request).then(function (response) {
             //We need to process the response
@@ -389,5 +393,15 @@ export const setName = (value) => {
 export const resetRegisterBikeState = () => {
     return {
         type: RESET_REGISTER_BIKE_STATE
+    }
+};
+
+/**
+ * Reset the state that handles transfer of ownership.
+ * @returns {{type: string}}
+ */
+export const resetTransferOwnershipState = () => {
+    return {
+        type: RESET_TRANSFER_OWNERSHIP_STATE
     }
 };
