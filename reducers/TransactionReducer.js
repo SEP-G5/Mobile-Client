@@ -71,9 +71,9 @@ export default (state = initialState, action) => {
             var transactions = action.payload.data;
             if (state.get('transactions').length !== undefined)
                 transactions = state.get('transactions').concat(action.payload.data);
-            transactions.sort((a,b) => (a.timestamp > b.timestamp) ? 1 : ((b.timestamp > a.timestamp) ? -1 : 0)); 
+            transactions.sort((a,b) => (a.timestamp > b.timestamp) ? 1 : ((b.timestamp > a.timestamp) ? -1 : 0));
             return state
-                .set('transactions', transactions)
+                .set('transactions', transactions.reverse())
                 .set('loading', false);
         case SET_CURRENT_IN_OVERLAY:
             return state.set('current', action.payload);

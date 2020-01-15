@@ -48,7 +48,7 @@ class DetailScreen extends Component {
                             <FlatList
                                 data={transactions}
                                 renderItem={({item}) => this.renderItem(item)}
-                                keyExtractor={item => item.id}
+                                keyExtractor={item => JSON.stringify(item.timestamp)}
                             />
                         </SafeAreaView>
                     </ScrollView>
