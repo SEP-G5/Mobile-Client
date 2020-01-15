@@ -32,7 +32,7 @@ class HomeScreen extends Component {
   }
 
   onPressItem = (item) => {
-      this.props.navigation.navigate('Detail', {item});
+      this.props.navigation.navigate('Detail', {id:item});
   };
 
   renderItem = (item) => {
