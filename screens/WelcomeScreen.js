@@ -63,7 +63,7 @@ class HomeScreen extends Component {
         </View>
     }
 
-    if (!bikes) {
+    if (!bikes || bikes.length === 0) {
         return <View style={styles.container}>
             <Text style={{fontSize:24, marginTop:15, textAlign:'center'}}>You don't own any bikes...</Text>
             <Button
