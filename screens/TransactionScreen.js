@@ -32,7 +32,7 @@ class TransactionScreen extends Component {
   }
 
   renderItem = (item) => {
-    let transactionType = item.publicKeyInput ? "(Transfer) to" + item.publicKeyOutput + "->" : '(Registration)';
+    let transactionType = item.publicKeyInput ? "(Transfer) to " + item.publicKeyOutput + "->" : '(Registration)';
     return (
       <ListItem
         title={`#${item.id} - ${transactionType} `}
@@ -60,7 +60,7 @@ class TransactionScreen extends Component {
           {transactions.length > 0 && <FlatList
               data={transactionsList}
               renderItem={({ item }) => this.renderItem(item)}
-              keyExtractor={item => item.id}
+              keyExtractor={item => JSON.stringify(item.timestamp)}
           />}
           {transactions.length === 0 &&
           <Text style={{fontSize:16, textAlign:'center'}}>{`No transactions were found...`}</Text>
