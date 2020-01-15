@@ -51,7 +51,7 @@ export default (state = initialState, action) => {
                 .set('publicKey', "")
                 .set('privateKey', "");
       case SET_VIEW_KEY:
-            return state.set('viewKey', action.payload)
+            return state.set('viewKey', action.payload);
         default:
             return state;
     }

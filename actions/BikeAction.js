@@ -2,6 +2,7 @@ import { Peer } from '../services/PeerService';
 import { Storage } from '../services/StorageService';
 
 export const STORAGE_BIKES = 'bikes';
+export const SEND_TRANSACTION_URL = '/transaction';
 
 export const GET_OWNED_BIKES_REQUEST = 'get_owned_bikes_request';
 export const GET_OWNED_BIKES_FAILURE = 'get_owned_bikes_failure';
@@ -28,6 +29,7 @@ export const refreshOwnedBikes = (publicKey) => {
 
         return refreshOwnedBikesAsync(publicKey).then(function () {
             dispatch(refreshOwnedBikesSuccess());
+            dispatch(getOwnedBikes());
         }).catch(function (error) {
             dispatch(refreshOwnedBikesFailure(error));
         });
@@ -45,6 +47,7 @@ const getOwnedBikesAsync = () => {
         }
         if (!Array.isArray(ownedBikes))
             ownedBikes = []
+
         resolve(ownedBikes);
     });
 }
@@ -53,36 +56,40 @@ const refreshOwnedBikesAsync = (publicKey) => {
     return new Promise(async function (resolve, reject) {
         let rejectedBikes = [];
         let ownedBikes = [];
-        let currentTransactions = undefined;
+        let currentTransactions = [];
         let skip = 0;
         const limit = 10;
-        while (currentTransactions != []) {
+        let done = false;
+
+        do {
             const request = {
                 method: 'get',
-                query: {
+                params: {
                     limit: limit,
                     skip: skip,
                     publicKey: publicKey
                 }
             };
             try {
-                currentTransactions = await Peer.sendRequest(SEND_TRANSACTION_URL, request);
+                const response = await Peer.sendRequest(SEND_TRANSACTION_URL, request);
+                currentTransactions = response.data;
                 currentTransactions = currentTransactions.reverse();
                 currentTransactions.forEach(function (transaction) {
                     if (rejectedBikes.includes(transaction.id) || ownedBikes.includes(transaction.id)) {
                         return;
                     }
-                    if (transaction.publicKeyOutput === publicKey) {
+                    if (transaction.publicKeyOutput.slice(0, -1) === publicKey) {
                         ownedBikes.push(transaction.id);
-                    } else if (transaction.publicKeyInput === publicKey) {
+                    } else if (transaction.publicKeyInput.slice(0, -1) === publicKey) {
                         rejectedBikes.push(transaction.id);
                     }
                 });
                 skip += limit;
             } catch (e) {
-                return reject(e);
+                console.log(e);
             }
-        }
+            done = true;
+        } while (!done);
         Storage.set(STORAGE_BIKES, JSON.stringify(ownedBikes)).then(function () {
             resolve();
         }).catch(function (error) {
@@ -109,9 +116,7 @@ const getOwnedBikesFailure = (error) => {
 const getOwnedBikesSuccess = (bikes) => {
     return {
         type: GET_OWNED_BIKES_SUCCESS,
-        payload: {
-            ...bikes
-        }
+        payload: bikes
     }
 }
 

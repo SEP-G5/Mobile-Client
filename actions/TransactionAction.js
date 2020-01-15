@@ -6,6 +6,8 @@ import { Task } from '../services/TaskService';
 export const SEND_PENDING_TRANSACTIONS_INTERVAL = 60 * 60;
 export const SEND_PENDING_TRANSACTIONS_TASK = 'send_pending_transactions_task';
 
+import { transactionToBuffer } from '../utils/transactionBuffer';
+
 export const STORAGE_TRANSACTIONS = 'transactions';
 
 export const SEND_TRANSACTION_URL = '/transaction';
@@ -28,6 +30,9 @@ export const SAVE_TRANSACTION_FAILURE = 'save_transaction_failure';
 export const SAVE_TRANSACTION_SUCCESS = 'save_transaction_success';
 export const SET_CURRENT_IN_OVERLAY = 'set_current_in_overlay';
 export const SET_VIEW_DETAIL = 'set_view_detail';
+export const SET_SN = 'set_sn';
+export const SET_NAME = 'set_name';
+export const RESET_REGISTER_BIKE_STATE = 'reset_register_bike_state';
 
 export const createTransaction = (id, publicKeyInput, publicKeyOutput, privateKey) => {
     return (dispatch) => {
@@ -62,8 +67,8 @@ const createTransactionAsync = (id, publicKeyInput, publicKeyOutput, privateKey)
             publicKeyOutput: publicKeyOutput,
             timestamp: Math.round(date.getTime() / 1000)
         };
-
-        Cryptography.sign(privateKey, transaction).then(function (signature) {
+        var transactionBuffer = transactionToBuffer(transaction);
+        Cryptography.sign(privateKey, transactionBuffer).then(function (signature) {
             resolve({
                 ...transaction,
                 signature: signature
@@ -85,8 +90,9 @@ const verifyTransactionAsync = (transaction) => {
 
         var signature = transactionClone.signature;
         delete transactionClone.signature;
+        var transactionBuffer = transactionToBuffer(transactionClone);
 
-        Cryptography.verify(key, signature, transactionClone).then(function (valid) {
+        Cryptography.verify(key, signature, transactionBuffer).then(function (valid) {
 
             resolve({
                 valid: valid
@@ -105,12 +111,19 @@ export const sendTransaction = (transaction) => {
                 'Content-Type': 'application/json'
             },
         };
+
         Peer.sendRequest(SEND_TRANSACTION_URL, request).then(function (response) {
-            dispatch(sendTransactionSuccess(response));
+            //We need to process the response
+            if (response.status === 200){
+                dispatch(sendTransactionSuccess(response));
+            } else {
+                dispatch(sendTransactionFailure(response));
+            }
         }).catch(function (error) {
-            dispatch(sendTransactionFailure(error));
+
             // if it is due to missing peers or no internet connection, save the transaction
             if (error.response) {
+                dispatch(sendTransactionFailure(error.response));
                 console.log(error.response.data);
                 console.log(error.response.status);
                 console.log(error.response.headers);
@@ -343,5 +356,39 @@ export const setViewDetail = (value) => {
     return {
         type: SET_VIEW_DETAIL,
         payload: value
+    }
+};
+
+/**
+ * Set Bike's Serial Number into state from the Register Form
+ * @param value
+ * @returns {{payload: *, type: string}}
+ */
+export const setSn = (value) => {
+    return {
+        type: SET_SN,
+        payload: value
+    }
+};
+
+/**
+ * Set Bike's Name into state from the Register Form
+ * @param value
+ * @returns {{payload: *, type: string}}
+ */
+export const setName = (value) => {
+    return {
+        type: SET_NAME,
+        payload: value
+    }
+};
+
+/**
+ * Reset the state that handles bike registration.
+ * @returns {{type: string}}
+ */
+export const resetRegisterBikeState = () => {
+    return {
+        type: RESET_REGISTER_BIKE_STATE
     }
 };

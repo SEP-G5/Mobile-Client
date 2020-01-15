@@ -2,6 +2,7 @@ import sha256 from 'crypto-js/sha256';
 import CryptoJS from 'crypto-js';
 import * as Random from 'expo-random';
 import { eddsa } from 'elliptic';
+import { encode, toBuffer } from 'base64url';
 
 export const PUBLIC_KEY = 'PUBLIC_KEY';
 export const PRIVATE_KEY = 'PRIVATE_KEY';
@@ -14,35 +15,38 @@ class Cryptography {
             const ec = new eddsa('ed25519');
             const keys = ec.keyFromSecret(randomBytes);
             resolve({
-                publicKey: keys.getPublic('hex'),
-                privateKey: keys.getSecret('hex')
+                publicKey: encode(keys.getPublic()),
+                privateKey: encode(keys.getSecret())
             });
-
         });
     }
 
-    static sign(privateKey, data) {
+    static sign(privateKey, dataBuffer) {
         return new Promise(async function (resolve) {
             const ec = new eddsa('ed25519');
+            privateKey = toBuffer(privateKey);
             const key = ec.keyFromSecret(privateKey);
-            const hash = Cryptography.getDataHash(data);
-            const signature = key.sign(hash).toHex();
+            //const hash = Cryptography.getDataHash(String.fromCharCode.apply(null, dataBuffer));
+            //We sign without hashing the buffer.
+            const signature = encode(key.sign(dataBuffer).toBytes());
             resolve(signature);
         });
     }
 
-    static verify(publicKey, signature, data) {
+    static verify(publicKey, signature, dataBuffer) {
         return new Promise(async function (resolve) {
             const ec = new eddsa('ed25519');
-            const key = ec.keyFromPublic(publicKey, 'hex');
-            const hash = Cryptography.getDataHash(data);
-            const valid = key.verify(hash, signature);
+            publicKey = Array.from(toBuffer(publicKey));
+            signature = Array.from(toBuffer(signature));
+            const key = ec.keyFromPublic(publicKey);
+            //const hash = Cryptography.getDataHash(String.fromCharCode.apply(null, dataBuffer));
+            const valid = key.verify(dataBuffer, signature);
             resolve(valid);
         });
     }
 
-    static getDataHash(data) {
-        return sha256(JSON.stringify(data)).toString(CryptoJS.enc.Hex);
+    static getDataHash(dataBuffer) {
+        return sha256(dataBuffer).toString();
     }
 
 }

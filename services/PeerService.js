@@ -2,13 +2,13 @@ import axios from 'axios';
 
 export const FETCH_PEER_URL = '/peer';
 const DEFAULT_PEERS = [
-    "localhost:8080"
+    "192.168.0.145:8000"
 ]
 
 class Peer {
     static sendRequest(url, request) {
         request = {
-            url: `${Peer.getOnePeer()}${url}`,
+            url: `http://${Peer.getOnePeer()}${url}`,
             ...request
         }
         return axios(request);

@@ -1,21 +1,35 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {setCurrentInOverlay, setViewDetail} from "../actions/TransactionAction";
+import {getKeyPair} from "../actions/KeyPairAction";
+import {getOwnedBikes, refreshOwnedBikes} from "../actions/BikeAction";
 import TopBarIcon from '../components/TopBarIcon';
-import { Platform, TouchableOpacity, View, FlatList, Text, SafeAreaView, StyleSheet, ScrollView} from 'react-native';
+import { Platform, TouchableOpacity, View, FlatList, Text, SafeAreaView, StyleSheet, ScrollView, RefreshControl} from 'react-native';
 import {ListItem, Button} from 'react-native-elements';
-import BicycleDetail from './../components/BicycleDetail';
 import _ from 'lodash';
 
 class HomeScreen extends Component {
   static navigationOptions = ({navigation}) => {
     return {
-        title: 'Home',
-        headerRight: <TouchableOpacity onPress={() => navigation.navigate('Scanner')}>
-          <TopBarIcon name={Platform.OS === 'ios'?`ios-camera`:'md-camera'}/>
+        title: 'My Bikes',
+        headerRight: <TouchableOpacity onPress={() => navigation.navigate('RegisterBike')}>
+          <TopBarIcon name={Platform.OS === 'ios'?`ios-add`:'md-add'}/>
         </TouchableOpacity>
       };
     };
+
+  componentDidMount() {
+      this.props.getKeyPair();
+  }
+
+  componentWillReceiveProps(nextProps, nextContext) {
+      const {publicKey: newPublicKey} = nextProps;
+      const {publicKey: oldPublicKey} = this.props;
+
+      if (newPublicKey !== oldPublicKey){
+          this.props.refreshOwnedBikes(newPublicKey);
+          this.props.getOwnedBikes();
+      }
+  }
 
   onPressItem = (item) => {
       this.props.navigation.navigate('Detail', {item});
@@ -25,9 +39,8 @@ class HomeScreen extends Component {
     return (
         <TouchableOpacity>
             <ListItem
-                title={_.truncate(item.name,{length: 30})}
-                subtitle={`# ${item.id}`}
-                subtitleStyle={{color:'#aaa', fontStyle:'italic'}}
+                title={`#${_.truncate(item,{length: 30})}`}
+                titleStyle={{color:'#aaa', fontStyle:'italic'}}
                 bottomDivider
                 chevron
                 onPress={() => this.onPressItem(item)}
@@ -36,29 +49,44 @@ class HomeScreen extends Component {
     );
   };
 
+  _onRefresh = () => {
+      const {publicKey} = this.props;
+      this.props.refreshOwnedBikes(publicKey);
+  };
+
   render(){
+    const {bikes, loadingBikes} = this.props;
+
+    if (loadingBikes) {
+        return <View style={styles.container}>
+            <Text style={{fontSize:24, textAlign:'center'}}>Loading Your Bikes...</Text>
+        </View>
+    }
+
+    if (!bikes || bikes.length === 0) {
+        return <View style={styles.container}>
+            <Text style={{fontSize:24, marginTop:15, textAlign:'center'}}>You don't own any bikes...</Text>
+            <Button
+                title="Register a bike!"
+                onPress={ () => this.props.navigation.navigate('RegisterBike')}
+                style={{marginTop:30, paddingLeft:20,paddingRight:20}}
+            />
+        </View>
+    }
+
     return (
       <View style={{flex:1}}>
-        <ScrollView>
+        <ScrollView
+            refreshControl={<RefreshControl refreshing={loadingBikes} onRefresh={() => this._onRefresh()} />}
+        >
           <SafeAreaView style={styles.container}>
-            <Text style={styles.title}> My Bikes </Text>
             <FlatList
-              data={MY_BIKES}
+              data={bikes}
               renderItem={({item}) => this.renderItem(item)}
-              keyExtractor={item => item.id}
+              keyExtractor={item => item}
             />
           </SafeAreaView>
         </ScrollView>
-        <Button
-            title="Receive Ownership"
-            onPress={ () => alert("Receive Bike")}
-            style={{marginBottom:15, paddingLeft:5,paddingRight:5}}
-        />
-        <BicycleDetail
-            current={this.props.current}
-            viewDetail={this.props.viewDetail}
-            closeF={this.props.setViewDetail}
-        />
       </View>
     );
   }
@@ -66,21 +94,15 @@ class HomeScreen extends Component {
 }
 
 const mapStateToProps = (state) => ({
-    current: state.get('transaction').get('current'),
-    viewDetail: state.get('transaction').get('viewDetail')
+    publicKey: state.get('keyPair').get('publicKey'),
+    bikes: state.get('bike').get('bikes'),
+    loadingBikes: state.get('bike').get('loading')
 });
 
-export default connect(mapStateToProps, {setCurrentInOverlay, setViewDetail})(HomeScreen);
-
-const MY_BIKES = [
-    {id: "JH4K3H5JDFJHDFJ34", name: "CITYCYKEL LÅGT INSTEG ELOPS 520 RÖD"},
-    {id: "JHASDJKHFSAJH434L", name: "MTB ROCKRIDER 100 24'' 9-12 ÅR"},
-    {id: "JKLSDHFADFHJ34343", name: "MTB ST 50 26'' SVART"}
-  ];
+export default connect(mapStateToProps, {getKeyPair, refreshOwnedBikes, getOwnedBikes})(HomeScreen);
 
 const styles = StyleSheet.create({
-  container: {flex:1},
-  title: {fontSize:24, paddingTop:10, paddingLeft:10},
-  item: {flex:1,paddingTop:20, paddingBottom:20,backgroundColor:'#eee',marginBottom:2},
-  itemTxt: {paddingLeft:5, color:'#000', fontSize: 18}
+    container: {flex: 1, justifyContent: 'center', paddingBottom: 10, paddingTop: 10, paddingLeft: 5, paddingRight: 5},
+    item: {flex:1,paddingTop:20, paddingBottom:20,backgroundColor:'#eee',marginBottom:2},
+    itemTxt: {paddingLeft:5, color:'#000', fontSize: 18}
 });

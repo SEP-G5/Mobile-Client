@@ -11,7 +11,11 @@ import {
     SEND_TRANSACTION_SUCCESS,
     GET_TRANSACTIONS_REQUEST,
     GET_TRANSACTIONS_FAILURE,
-    GET_TRANSACTIONS_SUCCESS, SET_CURRENT_IN_OVERLAY, SET_VIEW_DETAIL,
+    GET_TRANSACTIONS_SUCCESS,
+    SET_CURRENT_IN_OVERLAY,
+    SET_VIEW_DETAIL,
+    SET_SN,
+    SET_NAME, RESET_REGISTER_BIKE_STATE
 } from '../actions/TransactionAction'
 
 const initialState = Immutable.fromJS({
@@ -25,9 +29,14 @@ const initialState = Immutable.fromJS({
     transactions: [],
     valid: false,
     loading: false,
+    success: undefined,
     error: undefined,
     current: undefined,
-    viewDetail: false
+    viewDetail: false,
+    registerForm:{
+        sn: '',
+        name: ''
+    }
 });
 
 export default (state = initialState, action) => {
@@ -37,7 +46,7 @@ export default (state = initialState, action) => {
         case VERIFY_TRANSACTION_REQUEST:
         case CREATE_TRANSACTION_REQUEST:
             return state
-                .set('loading', true);
+                .set('loading', true).set('success', false);
         case GET_TRANSACTIONS_FAILURE:
         case SEND_TRANSACTION_FAILURE:
         case VERIFY_TRANSACTION_FAILURE:
@@ -55,7 +64,7 @@ export default (state = initialState, action) => {
                 .set('loading', false);
         case SEND_TRANSACTION_SUCCESS:
             return state
-                .set('loading', false);
+                .set('loading', false).set('success', true);
         case GET_TRANSACTIONS_SUCCESS:
             return state
                 .set('transactions', action.payload)
@@ -64,6 +73,15 @@ export default (state = initialState, action) => {
             return state.set('current', action.payload);
         case SET_VIEW_DETAIL:
             return state.set('viewDetail', action.payload);
+        case SET_SN:
+            return state.setIn(['registerForm', 'sn'], action.payload);
+        case SET_NAME:
+            return state.setIn(['registerForm', 'name'], action.payload);
+        case RESET_REGISTER_BIKE_STATE:
+            return state.setIn(['registerForm', 'sn'], '')
+                        .setIn(['registerForm', 'name'], '')
+                        .set('success', undefined)
+                        .set('error', undefined);
         default:
             return state;
     }
