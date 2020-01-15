@@ -21,8 +21,14 @@ class TransactionScreen extends Component {
   }
 
   search(text) {
-    this.props.getTransactions(0, 0, text, undefined);
-    this.props.getTransactions(0, 0, undefined, text);
+    if (text){
+      this.props.getTransactions(0, 0, text, undefined);
+      this.props.getTransactions(0, 0, undefined, text);
+    } else {
+      const {publicKey} = this.props;
+      this.props.getTransactions(0, 0, publicKey);
+    }
+
   }
 
   renderItem = (item) => {
@@ -40,7 +46,7 @@ class TransactionScreen extends Component {
   render() {
     const { transactions } = this.props;
     const transactionsList = transactions.length === undefined ? [] : transactions;
-    console.log(transactionsList);
+    //console.log(transactionsList);
     return (
 
       <View style={{ flex: 1 }}>
