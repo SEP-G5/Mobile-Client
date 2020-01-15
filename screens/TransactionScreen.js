@@ -57,11 +57,14 @@ class TransactionScreen extends Component {
             rightIcon={{ type: 'font-awesome', name: 'search' }}
           />
           <Text>{'\n'}</Text>
-          <FlatList
-            data={transactionsList}
-            renderItem={({ item }) => this.renderItem(item)}
-            keyExtractor={item => item.id}
-          />
+          {transactions.length > 0 && <FlatList
+              data={transactionsList}
+              renderItem={({ item }) => this.renderItem(item)}
+              keyExtractor={item => item.id}
+          />}
+          {transactions.length === 0 &&
+          <Text style={{fontSize:16, textAlign:'center'}}>{`No transactions were found...`}</Text>
+          }
         </SafeAreaView>
       </View>
     );
