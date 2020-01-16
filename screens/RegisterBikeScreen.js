@@ -57,7 +57,7 @@ class RegisterBikeScreen extends Component {
             </View>
         }
 
-        if (error !== undefined){
+        if (error !== undefined && error.error !== undefined && error.error.data !== undefined && error.error.data.msg !== undefined){
             errorMessage = error.error.data.msg;
         }
 

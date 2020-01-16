@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { View, FlatList, Text, SafeAreaView, StyleSheet } from 'react-native';
+import { View, FlatList, Text, SafeAreaView, StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import TopBarIcon from '../components/TopBarIcon';
 import { Platform } from 'react-native';
 import { ListItem, Input } from 'react-native-elements';
@@ -43,12 +43,17 @@ class TransactionScreen extends Component {
     );
   };
 
+  _onRefresh = () => {
+    const {publicKey} = this.props;
+    this.props.getTransactions(0, 0, publicKey);
+  };
+
   render() {
-    const { transactions } = this.props;
+    const { transactions, loading, refreshing } = this.props;
     const transactionsList = transactions.length === undefined ? [] : transactions;
     //console.log(transactionsList);
-    return (
 
+    return (
       <View style={{ flex: 1 }}>
         <SafeAreaView style={styles.container}>
           <Input
@@ -57,14 +62,18 @@ class TransactionScreen extends Component {
             rightIcon={{ type: 'font-awesome', name: 'search' }}
           />
           <Text>{'\n'}</Text>
-          {transactions.length > 0 && <FlatList
-              data={transactionsList}
-              renderItem={({ item }) => this.renderItem(item)}
-              keyExtractor={item => JSON.stringify(item.timestamp)}
-          />}
-          {transactions.length === 0 &&
-          <Text style={{fontSize:16, textAlign:'center'}}>{`No transactions were found...`}</Text>
-          }
+          {transactions.length > 0 && <ScrollView
+              refreshControl={<RefreshControl refreshing={loading} onRefresh={() => this._onRefresh()} />}
+          >
+            <FlatList
+                data={transactionsList}
+                renderItem={({ item }) => this.renderItem(item)}
+                keyExtractor={item => JSON.stringify(item.timestamp)}
+            />
+          </ScrollView>}
+          {transactions.length === 0 && <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={() => this._onRefresh()} />}>
+            <Text style={{fontSize:16, textAlign:'center'}}>{`No transactions were found...`}</Text>
+            </ScrollView>}
         </SafeAreaView>
       </View>
     );
@@ -83,6 +92,6 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   item: { flex: 1, paddingTop: 20, paddingBottom: 20, backgroundColor: '#eee', marginBottom: 2 },
   itemTxt: { paddingLeft: 5, color: '#000', fontSize: 18 }
-})
+});
 
 export default connect(mapStateToProps, { getTransactions })(TransactionScreen);
